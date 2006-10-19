@@ -1,3 +1,4 @@
+//  Copyright (C) 2006 Lokkju, Inc (lokkju@lokkju.com) All Rights Reserved.
 //  Copyright (C) 2002 Ultr@VNC Team Members. All Rights Reserved.
 //  Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
