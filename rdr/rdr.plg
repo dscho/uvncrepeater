@@ -1,0 +1,41 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: rdr - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\luk\LOCALS~1\Temp\RSPDD.tmp" with contents
+[
+/nologo /MD /W3 /GX /O1 /I ".." /I "../zlib" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/rdr.pch" /YX /Fo"Release/" /Fd"Release/" /FD /O3 /QaxM /Qip /Qsox- /c 
+"C:\Documents and Settings\luk\Desktop\Z_SC\Z_SC\rdr\FdInStream.cxx"
+"C:\Documents and Settings\luk\Desktop\Z_SC\Z_SC\rdr\FdOutStream.cxx"
+"C:\Documents and Settings\luk\Desktop\Z_SC\Z_SC\rdr\InStream.cxx"
+"C:\Documents and Settings\luk\Desktop\Z_SC\Z_SC\rdr\NullOutStream.cxx"
+"C:\Documents and Settings\luk\Desktop\Z_SC\Z_SC\rdr\ZlibInStream.cxx"
+"C:\Documents and Settings\luk\Desktop\Z_SC\Z_SC\rdr\ZlibOutStream.cxx"
+]
+Creating command line "cl.exe @C:\DOCUME~1\luk\LOCALS~1\Temp\RSPDD.tmp" 
+Creating command line "link.exe -lib /nologo /out:"Release\rdr.lib"  ".\Release\FdInStream.obj" ".\Release\FdOutStream.obj" ".\Release\InStream.obj" ".\Release\NullOutStream.obj" ".\Release\ZlibInStream.obj" ".\Release\ZlibOutStream.obj" "
+<h3>Output Window</h3>
+Compiling...
+Command line warning D4002 : ignoring unknown option '/O3'
+Command line warning D4002 : ignoring unknown option '/QaxM'
+Command line warning D4002 : ignoring unknown option '/Qip'
+Command line warning D4002 : ignoring unknown option '/Qsox-'
+FdInStream.cxx
+FdOutStream.cxx
+InStream.cxx
+NullOutStream.cxx
+ZlibInStream.cxx
+ZlibOutStream.cxx
+Creating library...
+
+
+
+<h3>Results</h3>
+rdr.lib - 0 error(s), 4 warning(s)
+</pre>
+</body>
+</html>

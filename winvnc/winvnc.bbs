@@ -1,0 +1,13 @@
+[Batch Build]
+omnithread - Win32 Debug=0
+omnithread - Win32 Release=0
+rdr - Win32 Debug=0
+rdr - Win32 Release=0
+vnchooks - Win32 Debug=0
+vnchooks - Win32 Release=0
+winvnc - Win32 Debug=0
+winvnc - Win32 Release=1
+Xregion - Win32 Debug=0
+Xregion - Win32 Release=0
+zlib - Win32 Debug=0
+zlib - Win32 Release=0

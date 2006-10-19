@@ -1,0 +1,29 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: Xregion - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\luk\LOCALS~1\Temp\RSPDE.tmp" with contents
+[
+/nologo /MD /W3 /GX /O1 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/Xregion.pch" /YX /Fo"Release/" /Fd"Release/" /FD /QaxWK /O3 /c 
+"C:\Documents and Settings\luk\Desktop\Z_SC\Z_SC\Xregion\Region.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\luk\LOCALS~1\Temp\RSPDE.tmp" 
+Creating command line "link.exe -lib /nologo /out:"Release\Xregion.lib"  ".\Release\Region.obj" "
+<h3>Output Window</h3>
+Compiling...
+Command line warning D4002 : ignoring unknown option '/QaxWK'
+Command line warning D4002 : ignoring unknown option '/O3'
+Region.c
+Creating library...
+
+
+
+<h3>Results</h3>
+Xregion.lib - 0 error(s), 2 warning(s)
+</pre>
+</body>
+</html>
