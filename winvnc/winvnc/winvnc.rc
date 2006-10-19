@@ -77,22 +77,23 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 IDD_ABOUT DIALOGEX 0, 0, 282, 158
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION " About WinVNC"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,8,135,54,16
     CONTROL         139,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | 
                     SS_SUNKEN,7,5,53,46,WS_EX_TRANSPARENT
-    LTEXT           "Ultr@VNC Win32 Server SC 20.3",IDC_VERSION,73,5,195,11
-    LTEXT           "Copyright © 2002-2003 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",
-                    IDC_NAME,74,27,202,41
+    LTEXT           "Ultr@VNC Win32 Server SC 20.3 mod SA",IDC_VERSION,73,5,
+                    195,11
+    LTEXT           "Copyright © 2006 Lokkju Inc\nCopyright © 2002-2003 Ultr@VNC Team\nCopyright © 2001-2002 Sam - eSVNC \nCopyright © 1999-2002 Rudi D. V. - VdaccVNC \nCopyright © 2001 Harakan Software - PalmVNC\nCopyright © 1999-2002 Const. Kaplinsky - TightVNC \n",
+                    IDC_NAME,74,26,201,48
     LTEXT           "For more Information and Links please visit: \nhttp://ultravnc.sf.net",
                     IDC_WWW,74,135,141,19
     LTEXT           "Build:",IDC_BUILDTEXT,74,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,97,16,92,10
     LTEXT           "Copyright © 2002 RealVNC Ltd. - RealVNC\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC \nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",
-                    IDC_STATIC,74,67,203,32
+                    IDC_STATIC,74,74,201,32
     LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",
-                    IDC_STATIC,74,99,200,27
+                    IDC_STATIC,74,107,201,27
 END
 
 IDD_PROPERTIES DIALOG DISCARDABLE  0, 0, 224, 126
@@ -175,7 +176,7 @@ END
 IDC_TITLEWINDOW_SMALL DIALOGEX 0, 0, 137, 41
 STYLE DS_SYSMODAL | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_TOOLWINDOW
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "Connect",IDC_CONNECT,5,20,72,14
     PUSHBUTTON      "Close",IDC_CLOSE,81,20,50,14
@@ -203,12 +204,12 @@ BEGIN
         BOTTOMMARGIN, 150
         HORZGUIDE, 9
         HORZGUIDE, 20
-        HORZGUIDE, 30
+        HORZGUIDE, 26
         HORZGUIDE, 40
         HORZGUIDE, 50
         HORZGUIDE, 60
         HORZGUIDE, 70
-        HORZGUIDE, 80
+        HORZGUIDE, 74
         HORZGUIDE, 90
         HORZGUIDE, 100
     END
@@ -269,12 +270,12 @@ BEGIN
             VALUE "CompanyName", "UltraVNC\0"
             VALUE "FileDescription", "VNC server for Win32\0"
             VALUE "FileVersion", "1, 1, 0, 0\0"
-            VALUE "InternalName", "WinVNC\0"
-            VALUE "LegalCopyright", "Copyright UltraVNC\0"
+            VALUE "InternalName", "WinVNC SC mod SA\0"
+            VALUE "LegalCopyright", "Copyright RealVNC, UltraVNC, Lokkju Inc, iFocus Consulting, et al\0"
             VALUE "LegalTrademarks", "VNC\0"
             VALUE "OriginalFilename", "WinVNC.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "UltraVNC\0"
+            VALUE "ProductName", "UltraVNC SC mod SA\0"
             VALUE "ProductVersion", "1, 1, 0, 0\0"
             VALUE "SpecialBuild", "\0"
         END

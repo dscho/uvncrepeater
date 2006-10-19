@@ -59,6 +59,8 @@ extern bool		g_id;
 unsigned short nport = 0;
 bool connected=0;
 char szAdrName[64];
+char szIconToolTip[100];
+int rport = 0;
 int connect_counter=0;
 extern char		Balloon1Title[150];
 extern char		Balloon2Title[150];
@@ -339,6 +341,7 @@ void GetIPAddrString(char *buffer, int buflen) {
 void
 vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 {
+	if (nport != 0) rport = nport;
 	// Create the tray icon message
 	m_nid.hWnd = m_hwnd;
 	m_nid.cbSize = sizeof(m_nid);
@@ -357,48 +360,58 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	// Try to add the server's IP addresses to the tip string, if possible
 	if (m_nid.uFlags & NIF_TIP)
 	{
-	    strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
 
+	    strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
+		#ifndef SINGLECLICKULTRA
 	    if (m_server->SockConnected())
 	    {
-		unsigned long tiplen = strlen(m_nid.szTip);
-		char *tipptr = ((char *)&m_nid.szTip) + tiplen;
-
-		GetIPAddrString(tipptr, sizeof(m_nid.szTip) - tiplen);
+			unsigned long tiplen = strlen(m_nid.szTip);
+			char *tipptr = ((char *)&m_nid.szTip) + tiplen;
+			GetIPAddrString(tipptr, sizeof(m_nid.szTip) - tiplen);
 	    }
 	    else
 	    {
-		strncat(m_nid.szTip, " listening", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
+			strncat(m_nid.szTip, " listening", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
 	    }
+		#else
+		if(nport!=0 && (connect_counter%5==0 || connect_counter==1)) {// We are trying to connect
+			sprintf(szIconToolTip," Trying to connect to %s:%d",szAdrName,rport);
+		}
+		else if(connected==1 && connect_counter%10==0) {// We are connected
+			sprintf(szIconToolTip," Connected to %s:%d",szAdrName,rport);
+		}
+		strncat(m_nid.szTip, szIconToolTip, (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
+		#endif // SINGLECLICKULTRA
+	
 	}
 	if (strcmp(Balloon1Title,"")!=NULL)if (nport!=0 && (connect_counter%5==0 || connect_counter==1))
 	{
-	char all[450];
-	strcpy(all,Balloon1A);
-	strcat(all,"\n");
-	strcat(all,Balloon1B);
-	strcat(all,"\n");
-	strcat(all,Balloon1C);
-	m_nid.uFlags |= NIF_INFO;
-	strncpy(m_nid.szInfo,all, sizeof(all));
-	strncpy(m_nid.szInfoTitle,Balloon1Title,sizeof(Balloon1Title));
-	m_nid.uTimeout=10000;
-	m_nid.dwInfoFlags=NIIF_INFO;
+		char all[450];
+		strcpy(all,Balloon1A);
+		strcat(all,"\n");
+		strcat(all,Balloon1B);
+		strcat(all,"\n");
+		strcat(all,Balloon1C);
+		m_nid.uFlags |= NIF_INFO;
+		strncpy(m_nid.szInfo,all, sizeof(all));
+		strncpy(m_nid.szInfoTitle,Balloon1Title,sizeof(Balloon1Title));
+		m_nid.uTimeout=10000;
+		m_nid.dwInfoFlags=NIIF_INFO;
 	}
 	if (strcmp(Balloon2Title,"")!=NULL)if (connected==1 && connect_counter%10==0)
 	{
-	connect_counter++;
-	char all[450];
-	strcpy(all,Balloon2A);
-	strcat(all,"\n");
-	strcat(all,Balloon2B);
-	strcat(all,"\n");
-	strcat(all,Balloon2C);
-	m_nid.uFlags |= NIF_INFO;
-	strncpy(m_nid.szInfo,all, sizeof(all));
-	strncpy(m_nid.szInfoTitle,Balloon2Title,sizeof(Balloon2Title));
-	m_nid.uTimeout=10000;
-	m_nid.dwInfoFlags=NIIF_INFO;
+		connect_counter++;
+		char all[450];
+		strcpy(all,Balloon2A);
+		strcat(all,"\n");
+		strcat(all,Balloon2B);
+		strcat(all,"\n");
+		strcat(all,Balloon2C);
+		m_nid.uFlags |= NIF_INFO;
+		strncpy(m_nid.szInfo,all, sizeof(all));
+		strncpy(m_nid.szInfoTitle,Balloon2Title,sizeof(Balloon2Title));
+		m_nid.uTimeout=10000;
+		m_nid.dwInfoFlags=NIIF_INFO;
 	}
 
 	// Send the message

@@ -1,3 +1,4 @@
+
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
 //  This file is part of the VNC system.
@@ -20,6 +21,9 @@
 // If the source code for the VNC system is not available from the place 
 // whence you received this file, check http://www.uk.research.att.com/vnc or contact
 // the authors on vnc@uk.research.att.com for information on obtaining it.
+
+// Modifications Copyright (C) 2006 Lokkju, Inc.  lokkju@lokkju.com
+// All Rights Reserved.
 
 // WinVNC.cpp
 
@@ -443,11 +447,12 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 					}
 #ifdef SINGLECLICKULTRA
 					else if (strlen(defaultHelpdeskTxt) > 50) {
-						char * myline;
 						bWebpage=false;
 						EnableWindow(GetDlgItem(hWnd,IDC_HELPWEB), false);
 						ShowWindow( GetDlgItem(hWnd,IDC_HELPWEB), SW_HIDE ); 
-						myline = strtok (defaultHelpdeskTxt,"\n");
+						char * myline = (char*)malloc(strlen(defaultHelpdeskTxt) + 1);
+						strcpy(myline,defaultHelpdeskTxt);
+						myline = strtok(myline,"\n");
 						while (myline != NULL)
 						{
 							int j=0;
@@ -461,7 +466,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 							if (strncmp(myline, "[HOST]", strlen("[HOST]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(g_var_20[i],"");
-								strncpy(g_var_20[i],myline,strlen(myline)-1);
+								strncpy(g_var_20[i],myline,strlen(myline));
 								iItem=SendMessage(hList,LVM_GETITEMCOUNT,0,0);
 								LvItem.iItem=iItem;            // choose item  
 								LvItem.iSubItem=0;         // Put in first coluom
@@ -475,43 +480,43 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 							if (strncmp(myline, "[TEXTTOP]", strlen("[TEXTTOP]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextTop,myline,strlen(myline)-1);
+								strncpy(TextTop,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_TEXTTOP, WM_SETTEXT, 0, (LONG)TextTop);
 							}
 
 							if (strncmp(myline, "[TEXTMIDDLE]", strlen("[TEXTMIDDLE]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextMiddle,myline,strlen(myline)-1);
+								strncpy(TextMiddle,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_TEXTMIDDLE, WM_SETTEXT, 0, (LONG)TextMiddle);
 							}
 
 							if (strncmp(myline, "[TEXTBOTTOM]", strlen("[TEXTBOTTOM]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextBottom,myline,strlen(myline)-1);
+								strncpy(TextBottom,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_TEXTBOTTOM, WM_SETTEXT, 0, (LONG)TextBottom);
 							}
 
 							if (strncmp(myline, "[TEXTRTOP]", strlen("[TEXTRTOP]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextRTop,myline,strlen(myline)-1);
+								strncpy(TextRTop,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_TEXTRICHTTOP, WM_SETTEXT, 0, (LONG)TextRTop);
 							}
 
 							if (strncmp(myline, "[TEXTRBOTTOM]", strlen("[TEXTRBOTTOM]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextRBottom,myline,strlen(myline)-1);
+								strncpy(TextRBottom,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_TEXTRIGHTBOTTOM, WM_SETTEXT, 0, (LONG)TextRBottom);
 							}
 
 							if (strncmp(myline, "[TEXTRMIDDLE]", strlen("[TEXTRMIDDLE]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextRMiddle,myline,strlen(myline)-1);
+								strncpy(TextRMiddle,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_TEXTRIGHTMIDDLE, WM_SETTEXT, 0, (LONG)TextRMiddle);
 							}
 
 							if (strncmp(myline, "[TEXTBUTTON]", strlen("[TEXTBUTTON]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextButton,myline,strlen(myline)-1);
+								strncpy(TextButton,myline,strlen(myline));
 								ShowWindow( GetDlgItem(hWnd,IDC_HELPWEB), SW_SHOW ); 
 								EnableWindow(GetDlgItem(hWnd,IDC_HELPWEB), true);
 								SendDlgItemMessage(hWnd,IDC_HELPWEB, WM_SETTEXT, 0, (LONG)TextButton);
@@ -520,14 +525,14 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 							if (strncmp(myline, "[TEXTCLOSEBUTTON]", strlen("[TEXTCLOSEBUTTON]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(TextCButton,"");
-								strncpy(TextCButton,myline,strlen(myline)-1);
+								strncpy(TextCButton,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_CLOSE, WM_SETTEXT, 0, (LONG)TextCButton);
 							}
 
 							if (strncmp(myline, "[TITLE]", strlen("[TITLE]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(TextTitle,myline);
-								TextTitle[strlen(myline)-1]='\0';
+								TextTitle[strlen(myline)]='\0';
 								SetWindowText(hWnd,TextTitle);
 							}
 
@@ -540,49 +545,49 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 							if (strncmp(myline, "[BALLOON1TITLE]", strlen("[BALLOON1TITLE]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon1Title,myline);
-								Balloon1Title[strlen(myline)-1]='\0';
+								Balloon1Title[strlen(myline)]='\0';
 							}
 							
 							if (strncmp(myline, "[BALLOON1A]", strlen("[BALLOON1A]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon1A,myline);
-								Balloon1A[strlen(myline)-1]='\0';
+								Balloon1A[strlen(myline)]='\0';
 							}
 							
 							if (strncmp(myline, "[BALLOON1B]", strlen("[BALLOON1B]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon1B,myline);
-								Balloon1B[strlen(myline)-1]='\0';
+								Balloon1B[strlen(myline)]='\0';
 							}
 							
 							if (strncmp(myline, "[BALLOON1C]", strlen("[BALLOON1C]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon1C,myline);
-								Balloon1C[strlen(myline)-1]='\0';
+								Balloon1C[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[BALLOON2TITLE]", strlen("[BALLOON2TITLE]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon2Title,myline);
-								Balloon2Title[strlen(myline)-1]='\0';
+								Balloon2Title[strlen(myline)]='\0';
 							}
 							
 							if (strncmp(myline, "[BALLOON2A]", strlen("[BALLOON2A]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon2A,myline);
-								Balloon2A[strlen(myline)-1]='\0';
+								Balloon2A[strlen(myline)]='\0';
 							}
 							
 							if (strncmp(myline, "[BALLOON2B]", strlen("[BALLOON2B]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon2B,myline);
-								Balloon2B[strlen(myline)-1]='\0';
+								Balloon2B[strlen(myline)]='\0';
 							}
 						
 							if (strncmp(myline, "[BALLOON2C]", strlen("[BALLOON2C]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon2C,myline);
-								Balloon2C[strlen(myline)-1]='\0';
+								Balloon2C[strlen(myline)]='\0';
 							}
 							
 							if (strncmp(myline, "[DIRECT]", strlen("[DIRECT]")) == 0) {
@@ -593,7 +598,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 								entercode=true;
 								myline = strtok(NULL,"\n");
 								strcpy(TextENTERCODE,myline);
-								TextENTERCODE[strlen(myline)-1]='\0';
+								TextENTERCODE[strlen(myline)]='\0';
 							}
 							if (strncmp(myline, "[DEBUG]", strlen("[DEBUG]")) == 0) {
 									vnclog.SetMode(4);
@@ -601,6 +606,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 							}
 							myline = strtok(NULL,"\n");								
 						}
+						free(myline);
 					}
 #endif // SINGLECLICKULTRA
 				else EndDialog(hWnd,0);
@@ -799,28 +805,29 @@ BOOL CALLBACK DialogProc_small(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lP
 						}
 				#ifdef SINGLECLICKULTRA
 					else if (strlen(defaultHelpdeskTxt) > 50) {
-						char * myline;
-						myline = strtok (defaultHelpdeskTxt,"\n");
+						char * myline = (char*)malloc(strlen(defaultHelpdeskTxt) + 1);
+						strcpy(myline,defaultHelpdeskTxt);
+						myline = strtok(myline,"\n");
 						while (myline != NULL)
 						{
 							if (strncmp(myline, "[HOST]", strlen("[HOST]")) == 0) {
 								myline = strtok(NULL,"\n");
 								myline = strtok(NULL,"\n");
 								strcpy(g_var_20[0],"");
-								strncpy(g_var_20[0],myline,strlen(myline)-1);
+								strncpy(g_var_20[0],myline,strlen(myline));
 								
 							}
 
 
 							if (strncmp(myline, "[TEXTMIDDLE]", strlen("[TEXTMIDDLE]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextMiddle,myline,strlen(myline)-1);
+								strncpy(TextMiddle,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_TEXTMIDDLE, WM_SETTEXT, 0, (LONG)TextMiddle);
 							}
 
 							if (strncmp(myline, "[TEXTBUTTON]", strlen("[TEXTBUTTON]")) == 0) {
 								myline = strtok(NULL,"\n");
-								strncpy(TextButton,myline,strlen(myline)-1);
+								strncpy(TextButton,myline,strlen(myline));
 								ShowWindow( GetDlgItem(hWnd,IDC_CONNECT), SW_SHOW ); 
 								EnableWindow(GetDlgItem(hWnd,IDC_CONNECT), true);
 								SendDlgItemMessage(hWnd,IDC_CONNECT, WM_SETTEXT, 0, (LONG)TextButton);
@@ -829,63 +836,63 @@ BOOL CALLBACK DialogProc_small(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lP
 							if (strncmp(myline, "[TEXTCLOSEBUTTON]", strlen("[TEXTCLOSEBUTTON]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(TextCButton,"");
-								strncpy(TextCButton,myline,strlen(myline)-1);
+								strncpy(TextCButton,myline,strlen(myline));
 								SendDlgItemMessage(hWnd,IDC_CLOSE, WM_SETTEXT, 0, (LONG)TextCButton);
 							}
 
 							if (strncmp(myline, "[TITLE]", strlen("[TITLE]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(TextTitle,myline);
-								TextTitle[strlen(myline)-1]='\0';
+								TextTitle[strlen(myline)]='\0';
 								SetWindowText(hWnd,TextTitle);
 							}
 
 							if (strncmp(myline, "[BALLOON1TITLE]", strlen("[BALLOON1TITLE]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon1Title,myline);
-								Balloon1Title[strlen(myline)-1]='\0';
+								Balloon1Title[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[BALLOON1A]", strlen("[BALLOON1A]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon1A,myline);
-								Balloon1A[strlen(myline)-1]='\0';
+								Balloon1A[strlen(myline)]='\0';
 							}
 							
 							if (strncmp(myline, "[BALLOON1B]", strlen("[BALLOON1B]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon1B,myline);
-								Balloon1B[strlen(myline)-1]='\0';
+								Balloon1B[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[BALLOON1C]", strlen("[BALLOON1C]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon1C,myline);
-								Balloon1C[strlen(myline)-1]='\0';
+								Balloon1C[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[BALLOON2TITLE]", strlen("[BALLOON2TITLE]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon2Title,myline);
-								Balloon2Title[strlen(myline)-1]='\0';
+								Balloon2Title[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[BALLOON2A]", strlen("[BALLOON2A]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon2A,myline);
-								Balloon2A[strlen(myline)-1]='\0';
+								Balloon2A[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[BALLOON2B]", strlen("[BALLOON2B]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon2B,myline);
-								Balloon2B[strlen(myline)-1]='\0';
+								Balloon2B[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[BALLOON2C]", strlen("[BALLOON2C]")) == 0) {
 								myline = strtok(NULL,"\n");
 								strcpy(Balloon2C,myline);
-								Balloon2C[strlen(myline)-1]='\0';
+								Balloon2C[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[DIRECT]", strlen("[DIRECT]")) == 0) {
@@ -896,7 +903,7 @@ BOOL CALLBACK DialogProc_small(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lP
 								entercode=true;
 								myline = strtok(NULL,"\n");
 								strcpy(TextENTERCODE,myline);
-								TextENTERCODE[strlen(myline)-1]='\0';
+								TextENTERCODE[strlen(myline)]='\0';
 							}
 
 							if (strncmp(myline, "[DEBUG]", strlen("[DEBUG]")) == 0) {
@@ -905,6 +912,7 @@ BOOL CALLBACK DialogProc_small(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lP
 							}								
 							myline = strtok(NULL,"\n");
 						}
+						free(myline);
 					}
 #endif // SINGLECLICKULTRA
 				else EndDialog(hWnd,0);
@@ -1093,8 +1101,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #ifdef SINGLECLICKULTRA
 	else
 	{
-		char * myline;
-		myline = strtok(defaultHelpdeskTxt,"\n");
+		char * myline = (char*)malloc(strlen(defaultHelpdeskTxt) + 1);
+		strcpy(myline,defaultHelpdeskTxt);
+		myline = strtok(myline,"\n");
 		while (myline != NULL)
 		{
 			if (strncmp(myline, "[SMALLGUI]", strlen("[SMALLGUI]")) == 0) smallgui=true;
@@ -1104,14 +1113,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				entercode=true;
 				myline = strtok(NULL,"\n");
 				strcpy(TextENTERCODE,myline);
-				TextENTERCODE[strlen(myline)-1]='\0';
+				TextENTERCODE[strlen(myline)]='\0';
 			}
 			if (strncmp(myline, "[DISPLAYID]", strlen("[DISPLAYID]")) == 0) displayID=true;
 			if (strncmp(myline, "[RANDOMCODEWITHPREFIX]", strlen("[RANDOMCODEWITHPREFIX]")) == 0) {
 				randomcode=true;
 				myline = strtok(NULL,"\n");
 				strcpy(TextRANDOMCODE,myline);
-				TextRANDOMCODE[strlen(myline)-1]='\0';
+				TextRANDOMCODE[strlen(myline)]='\0';
 			}
 			if (strncmp(myline, "[RANDOMCODE]", strlen("[RANDOMCODE]")) == 0) randomcode=true;
 			if (strncmp(myline, "[FETCHCODE]", strlen("[FETCHCODE]")) == 0) 
@@ -1119,10 +1128,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				fetchcode=true;
 				myline = strtok(NULL,"\n");
 				strcpy(TextFETCHCODE,myline);
-				TextFETCHCODE[strlen(myline)-1]='\0';	
+				TextFETCHCODE[strlen(myline)]='\0';	
 			}
 			myline = strtok(NULL,"\n");
 		}
+		free(myline);
 
 	}
 #endif
@@ -1162,8 +1172,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #ifdef SINGLECLICKULTRA
 		else
 		{
-			char * myline;
-			myline = strtok(defaultHelpdeskTxt,"\n");
+			char * myline = (char*)malloc(strlen(defaultHelpdeskTxt) + 1);
+			strcpy(myline,defaultHelpdeskTxt);
+			myline = strtok(myline,"\n");
 			while( myline != NULL)
 			{
 				////////////////////////////////////////////////////
@@ -1174,10 +1185,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					myline = strtok(NULL,"\n");
 					myline = strtok(NULL,"\n");
 					strcpy(g_var_20[0],"");
-					strncpy(g_var_20[0],myline,strlen(myline)-1);
+					strncpy(g_var_20[0],myline,strlen(myline));
 				}
 				strcpy(defaultCommandLine,g_var_20[0]);
+				myline = strtok(NULL,"\n");
 			}
+			free(myline);
 
 		}
 #endif // SINGLECLICKULTRA
@@ -1286,7 +1299,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 				int mili=(int)time.wMilliseconds;
 				while(mili<1000) { mili=mili*10; }; if(mili>9999) mili=mili/10;
-				sprintf(g_idcode,"%d%d",TextRANDOMCODE,mili);
+				sprintf(g_idcode,"%s%d",TextRANDOMCODE,mili);
 			}
 			else if(fetchcode)
 			{
