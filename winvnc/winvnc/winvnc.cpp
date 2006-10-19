@@ -91,10 +91,13 @@ char		Balloon2B[150]="";
 char		Balloon2C[150]="";
 char		TextENTERCODE[150]="";
 char		TextFETCHCODE[300]="";
+char		TextRANDOMCODE[150]="";
 
 #ifdef SINGLECLICKULTRA
 // actual default command line to be patched after compilation
 char  defaultCommandLine[1024]="";
+// default helpdesk.txt to be embeded after compile
+char  defaultHelpdeskTxt[1024]="[INTERNALHELPDESK]\n";
 #endif
 
 
@@ -437,7 +440,169 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 								
 							}
 						fclose(fid);
-					}				
+					}
+#ifdef SINGLECLICKULTRA
+					else if (strlen(defaultHelpdeskTxt) > 50) {
+						char * myline;
+						bWebpage=false;
+						EnableWindow(GetDlgItem(hWnd,IDC_HELPWEB), false);
+						ShowWindow( GetDlgItem(hWnd,IDC_HELPWEB), SW_HIDE ); 
+						myline = strtok (defaultHelpdeskTxt,"\n");
+						while (myline != NULL)
+						{
+							int j=0;
+							if (strncmp(myline, "[END]", strlen("[END]")) == 0) {
+								break;
+							}
+							if (strncmp(myline, "[BEGIN HOSTLIST]", strlen("[BEGIN HOSTLIST]")) == 0) {
+								continue;
+							}
+
+							if (strncmp(myline, "[HOST]", strlen("[HOST]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(g_var_20[i],"");
+								strncpy(g_var_20[i],myline,strlen(myline)-1);
+								iItem=SendMessage(hList,LVM_GETITEMCOUNT,0,0);
+								LvItem.iItem=iItem;            // choose item  
+								LvItem.iSubItem=0;         // Put in first coluom
+								LvItem.pszText=g_var_20[i];
+								SendMessage(hList,LVM_INSERTITEM,0,(LPARAM)&LvItem);
+								myline = strtok(NULL,"\n");
+								strcpy(g_var[i],"");
+								strcpy(g_var[i],myline);
+								i++;
+							}
+
+							if (strncmp(myline, "[TEXTTOP]", strlen("[TEXTTOP]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextTop,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_TEXTTOP, WM_SETTEXT, 0, (LONG)TextTop);
+							}
+
+							if (strncmp(myline, "[TEXTMIDDLE]", strlen("[TEXTMIDDLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextMiddle,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_TEXTMIDDLE, WM_SETTEXT, 0, (LONG)TextMiddle);
+							}
+
+							if (strncmp(myline, "[TEXTBOTTOM]", strlen("[TEXTBOTTOM]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextBottom,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_TEXTBOTTOM, WM_SETTEXT, 0, (LONG)TextBottom);
+							}
+
+							if (strncmp(myline, "[TEXTRTOP]", strlen("[TEXTRTOP]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextRTop,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_TEXTRICHTTOP, WM_SETTEXT, 0, (LONG)TextRTop);
+							}
+
+							if (strncmp(myline, "[TEXTRBOTTOM]", strlen("[TEXTRBOTTOM]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextRBottom,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_TEXTRIGHTBOTTOM, WM_SETTEXT, 0, (LONG)TextRBottom);
+							}
+
+							if (strncmp(myline, "[TEXTRMIDDLE]", strlen("[TEXTRMIDDLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextRMiddle,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_TEXTRIGHTMIDDLE, WM_SETTEXT, 0, (LONG)TextRMiddle);
+							}
+
+							if (strncmp(myline, "[TEXTBUTTON]", strlen("[TEXTBUTTON]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextButton,myline,strlen(myline)-1);
+								ShowWindow( GetDlgItem(hWnd,IDC_HELPWEB), SW_SHOW ); 
+								EnableWindow(GetDlgItem(hWnd,IDC_HELPWEB), true);
+								SendDlgItemMessage(hWnd,IDC_HELPWEB, WM_SETTEXT, 0, (LONG)TextButton);
+							}
+
+							if (strncmp(myline, "[TEXTCLOSEBUTTON]", strlen("[TEXTCLOSEBUTTON]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(TextCButton,"");
+								strncpy(TextCButton,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_CLOSE, WM_SETTEXT, 0, (LONG)TextCButton);
+							}
+
+							if (strncmp(myline, "[TITLE]", strlen("[TITLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(TextTitle,myline);
+								TextTitle[strlen(myline)-1]='\0';
+								SetWindowText(hWnd,TextTitle);
+							}
+
+							if (strncmp(myline, "[WEBPAGE]", strlen("[WEBPAGE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Webpage,myline);
+								bWebpage=true;
+							}
+
+							if (strncmp(myline, "[BALLOON1TITLE]", strlen("[BALLOON1TITLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon1Title,myline);
+								Balloon1Title[strlen(myline)-1]='\0';
+							}
+							
+							if (strncmp(myline, "[BALLOON1A]", strlen("[BALLOON1A]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon1A,myline);
+								Balloon1A[strlen(myline)-1]='\0';
+							}
+							
+							if (strncmp(myline, "[BALLOON1B]", strlen("[BALLOON1B]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon1B,myline);
+								Balloon1B[strlen(myline)-1]='\0';
+							}
+							
+							if (strncmp(myline, "[BALLOON1C]", strlen("[BALLOON1C]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon1C,myline);
+								Balloon1C[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[BALLOON2TITLE]", strlen("[BALLOON2TITLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon2Title,myline);
+								Balloon2Title[strlen(myline)-1]='\0';
+							}
+							
+							if (strncmp(myline, "[BALLOON2A]", strlen("[BALLOON2A]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon2A,myline);
+								Balloon2A[strlen(myline)-1]='\0';
+							}
+							
+							if (strncmp(myline, "[BALLOON2B]", strlen("[BALLOON2B]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon2B,myline);
+								Balloon2B[strlen(myline)-1]='\0';
+							}
+						
+							if (strncmp(myline, "[BALLOON2C]", strlen("[BALLOON2C]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon2C,myline);
+								Balloon2C[strlen(myline)-1]='\0';
+							}
+							
+							if (strncmp(myline, "[DIRECT]", strlen("[DIRECT]")) == 0) {
+								direct=true;
+							}
+							
+							if (strncmp(myline, "[ENTERCODE]", strlen("[ENTERCODE]")) == 0) {
+								entercode=true;
+								myline = strtok(NULL,"\n");
+								strcpy(TextENTERCODE,myline);
+								TextENTERCODE[strlen(myline)-1]='\0';
+							}
+							if (strncmp(myline, "[DEBUG]", strlen("[DEBUG]")) == 0) {
+									vnclog.SetMode(4);
+									vnclog.SetLevel(9);
+							}
+							myline = strtok(NULL,"\n");								
+						}
+					}
+#endif // SINGLECLICKULTRA
 				else EndDialog(hWnd,0);
 				if (i==1 && direct) 
 				{
@@ -632,6 +797,116 @@ BOOL CALLBACK DialogProc_small(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lP
 							}
 						fclose(fid);
 						}
+				#ifdef SINGLECLICKULTRA
+					else if (strlen(defaultHelpdeskTxt) > 50) {
+						char * myline;
+						myline = strtok (defaultHelpdeskTxt,"\n");
+						while (myline != NULL)
+						{
+							if (strncmp(myline, "[HOST]", strlen("[HOST]")) == 0) {
+								myline = strtok(NULL,"\n");
+								myline = strtok(NULL,"\n");
+								strcpy(g_var_20[0],"");
+								strncpy(g_var_20[0],myline,strlen(myline)-1);
+								
+							}
+
+
+							if (strncmp(myline, "[TEXTMIDDLE]", strlen("[TEXTMIDDLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextMiddle,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_TEXTMIDDLE, WM_SETTEXT, 0, (LONG)TextMiddle);
+							}
+
+							if (strncmp(myline, "[TEXTBUTTON]", strlen("[TEXTBUTTON]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strncpy(TextButton,myline,strlen(myline)-1);
+								ShowWindow( GetDlgItem(hWnd,IDC_CONNECT), SW_SHOW ); 
+								EnableWindow(GetDlgItem(hWnd,IDC_CONNECT), true);
+								SendDlgItemMessage(hWnd,IDC_CONNECT, WM_SETTEXT, 0, (LONG)TextButton);
+							}
+
+							if (strncmp(myline, "[TEXTCLOSEBUTTON]", strlen("[TEXTCLOSEBUTTON]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(TextCButton,"");
+								strncpy(TextCButton,myline,strlen(myline)-1);
+								SendDlgItemMessage(hWnd,IDC_CLOSE, WM_SETTEXT, 0, (LONG)TextCButton);
+							}
+
+							if (strncmp(myline, "[TITLE]", strlen("[TITLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(TextTitle,myline);
+								TextTitle[strlen(myline)-1]='\0';
+								SetWindowText(hWnd,TextTitle);
+							}
+
+							if (strncmp(myline, "[BALLOON1TITLE]", strlen("[BALLOON1TITLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon1Title,myline);
+								Balloon1Title[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[BALLOON1A]", strlen("[BALLOON1A]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon1A,myline);
+								Balloon1A[strlen(myline)-1]='\0';
+							}
+							
+							if (strncmp(myline, "[BALLOON1B]", strlen("[BALLOON1B]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon1B,myline);
+								Balloon1B[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[BALLOON1C]", strlen("[BALLOON1C]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon1C,myline);
+								Balloon1C[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[BALLOON2TITLE]", strlen("[BALLOON2TITLE]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon2Title,myline);
+								Balloon2Title[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[BALLOON2A]", strlen("[BALLOON2A]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon2A,myline);
+								Balloon2A[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[BALLOON2B]", strlen("[BALLOON2B]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon2B,myline);
+								Balloon2B[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[BALLOON2C]", strlen("[BALLOON2C]")) == 0) {
+								myline = strtok(NULL,"\n");
+								strcpy(Balloon2C,myline);
+								Balloon2C[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[DIRECT]", strlen("[DIRECT]")) == 0) {
+								direct=true;
+							}
+							
+							if (strncmp(myline, "[ENTERCODE]", strlen("[ENTERCODE]")) == 0) {
+								entercode=true;
+								myline = strtok(NULL,"\n");
+								strcpy(TextENTERCODE,myline);
+								TextENTERCODE[strlen(myline)-1]='\0';
+							}
+
+							if (strncmp(myline, "[DEBUG]", strlen("[DEBUG]")) == 0) {
+									vnclog.SetMode(4);
+									vnclog.SetLevel(9);
+							}								
+							myline = strtok(NULL,"\n");
+						}
+					}
+#endif // SINGLECLICKULTRA
 				else EndDialog(hWnd,0);
 				if (i==1 && direct) 
 				{
@@ -798,6 +1073,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				TextENTERCODE[strlen(myline)-1]='\0';
 			}
 			if (strncmp(myline, "[DISPLAYID]", strlen("[DISPLAYID]")) == 0) displayID=true;
+			if (strncmp(myline, "[RANDOMCODEWITHPREFIX]", strlen("[RANDOMCODEWITHPREFIX]")) == 0) {
+				randomcode=true;
+				fgets( myline, sizeof(myline), fid );
+				strcpy(TextRANDOMCODE,myline);
+				TextRANDOMCODE[strlen(myline)-1]='\0';
+			}
 			if (strncmp(myline, "[RANDOMCODE]", strlen("[RANDOMCODE]")) == 0) randomcode=true;
 			if (strncmp(myline, "[FETCHCODE]", strlen("[FETCHCODE]")) == 0) 
 			{
@@ -809,6 +1090,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		}
 	fclose(fid);
 	}
+#ifdef SINGLECLICKULTRA
+	else
+	{
+		char * myline;
+		myline = strtok(defaultHelpdeskTxt,"\n");
+		while (myline != NULL)
+		{
+			if (strncmp(myline, "[SMALLGUI]", strlen("[SMALLGUI]")) == 0) smallgui=true;
+			if (strncmp(myline, "[NOGUI]", strlen("[NOGUI]")) == 0) nogui=true;
+			if (strncmp(myline, "[ENTERCODE]", strlen("[ENTERCODE]")) == 0) 
+			{
+				entercode=true;
+				myline = strtok(NULL,"\n");
+				strcpy(TextENTERCODE,myline);
+				TextENTERCODE[strlen(myline)-1]='\0';
+			}
+			if (strncmp(myline, "[DISPLAYID]", strlen("[DISPLAYID]")) == 0) displayID=true;
+			if (strncmp(myline, "[RANDOMCODEWITHPREFIX]", strlen("[RANDOMCODEWITHPREFIX]")) == 0) {
+				randomcode=true;
+				myline = strtok(NULL,"\n");
+				strcpy(TextRANDOMCODE,myline);
+				TextRANDOMCODE[strlen(myline)-1]='\0';
+			}
+			if (strncmp(myline, "[RANDOMCODE]", strlen("[RANDOMCODE]")) == 0) randomcode=true;
+			if (strncmp(myline, "[FETCHCODE]", strlen("[FETCHCODE]")) == 0) 
+			{
+				fetchcode=true;
+				myline = strtok(NULL,"\n");
+				strcpy(TextFETCHCODE,myline);
+				TextFETCHCODE[strlen(myline)-1]='\0';	
+			}
+			myline = strtok(NULL,"\n");
+		}
+
+	}
+#endif
 	
 
 
@@ -842,6 +1159,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			}
 		fclose(fid);
 		}
+#ifdef SINGLECLICKULTRA
+		else
+		{
+			char * myline;
+			myline = strtok(defaultHelpdeskTxt,"\n");
+			while( myline != NULL)
+			{
+				////////////////////////////////////////////////////
+
+
+				if (strncmp(myline, "[HOST]", strlen("[HOST]")) == 0) 
+				{
+					myline = strtok(NULL,"\n");
+					myline = strtok(NULL,"\n");
+					strcpy(g_var_20[0],"");
+					strncpy(g_var_20[0],myline,strlen(myline)-1);
+				}
+				strcpy(defaultCommandLine,g_var_20[0]);
+			}
+
+		}
+#endif // SINGLECLICKULTRA
 	}
 	else
 	//Load command line from extra menu
@@ -947,7 +1286,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 				int mili=(int)time.wMilliseconds;
 				while(mili<1000) { mili=mili*10; }; if(mili>9999) mili=mili/10;
-				sprintf(g_idcode,"%d",mili);
+				sprintf(g_idcode,"%d%d",TextRANDOMCODE,mili);
 			}
 			else if(fetchcode)
 			{
