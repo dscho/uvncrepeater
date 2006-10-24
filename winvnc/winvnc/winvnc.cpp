@@ -437,8 +437,11 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 								if (strncmp(myline, "[DEBUG]", strlen("[DEBUG]")) == 0) {
 									vnclog.SetMode(4);
 									vnclog.SetLevel(9);
-								}							
-								
+								}
+								if (strncmp(myline, "[DEBUGTOFILE]", strlen("[DEBUGTOFILE]")) == 0) {
+									vnclog.SetMode(2);
+									vnclog.SetLevel(9);
+								}
 							}
 						fclose(fid);
 					}
@@ -599,6 +602,10 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 							}
 							if (strncmp(myline, "[DEBUG]", strlen("[DEBUG]")) == 0) {
 									vnclog.SetMode(4);
+									vnclog.SetLevel(9);
+							}
+							if (strncmp(myline, "[DEBUGTOFILE]", strlen("[DEBUGTOFILE]")) == 0) {
+									vnclog.SetMode(2);
 									vnclog.SetLevel(9);
 							}
 							myline = strtok(NULL,"\n");								

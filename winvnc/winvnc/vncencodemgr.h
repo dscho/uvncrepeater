@@ -41,6 +41,7 @@ class vncEncodeMgr;
 #include "vncEncoder.h"
 #include "vncEncodeHexT.h"
 #include "vncEncodeZRLE.h"
+#include "vncEncodeZlib.h"
 //#include "vncEncodetight.h"
 #include "vncBuffer.h"
 
@@ -135,7 +136,9 @@ protected:
 	rfbTranslateFnType	m_transfunc;
 	vncEncoder*		m_encoder;
 	vncEncoder*		zrleEncoder;
-
+	bool			zlib_encoder_in_use;
+	vncEncoder*		m_hold_zlib_encoder;
+	
 	// Tight 
 	int				m_compresslevel;
 	int				m_qualitylevel;
@@ -180,6 +183,8 @@ inline vncEncodeMgr::vncEncodeMgr()
 	m_clientbackbuffsize = 0;*/
 
 	m_clientfmtset = FALSE;
+	zlib_encoder_in_use = false;
+	m_hold_zlib_encoder = NULL;
 
 	// Tight 
 	m_compresslevel = 6;
@@ -199,11 +204,15 @@ inline vncEncodeMgr::~vncEncodeMgr()
 {
 	if (zrleEncoder && zrleEncoder != m_encoder)
 		delete zrleEncoder;
-
+	if (m_hold_zlib_encoder != NULL && m_hold_zlib_encoder != m_encoder) {
+		delete m_hold_zlib_encoder;
+		m_hold_zlib_encoder = NULL;
+	}
 	if (m_encoder != NULL)
 	{
 		delete m_encoder;
 		m_encoder = NULL;
+		m_hold_zlib_encoder = NULL;
 
 	}
 	if (m_clientbuff != NULL)
@@ -331,11 +340,18 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 	if (m_encoder != NULL)
 	{
 		
-		if (m_encoder != zrleEncoder)
-			delete m_encoder;
+		if ( zlib_encoder_in_use )
+		{
+			m_hold_zlib_encoder = m_encoder;
+		} else {
+			if (m_encoder != zrleEncoder)
+				delete m_encoder;
+		}
 		m_encoder = NULL;
 		
 	}
+	zlib_encoder_in_use = false;
+	
 	// Returns FALSE if the desired encoding cannot be used
 	switch(encoding)
 	{
@@ -363,8 +379,26 @@ vncEncodeMgr::SetEncoding(CARD32 encoding,BOOL reinitialize)
 			return FALSE;
 		break;
 	case rfbEncodingTight:
+		vnclog.Print(LL_INTERR, VNCLOG("unknown encoder requested\n"));
+		return FALSE;
 	case rfbEncodingZlib:
+		vnclog.Print(LL_INTINFO, VNCLOG("Zlib encoder requested\n"));
+
+		if ( m_hold_zlib_encoder == NULL )
+		{
+			m_encoder = new vncEncodeZlib;
+		}
+		else
+		{
+			m_encoder = m_hold_zlib_encoder;
+		}
+		if (m_encoder == NULL)
+			return FALSE;
+		zlib_encoder_in_use = true;//
+		break;
 	case rfbEncodingZlibHex:
+		vnclog.Print(LL_INTERR, VNCLOG("unknown encoder requested\n"));
+		return FALSE;
 	case rfbEncodingZRLE:
 		vnclog.Print(LL_INTINFO, VNCLOG("ZRLE encoder requested\n"));
 		if (!zrleEncoder)
@@ -471,7 +505,15 @@ vncEncodeMgr::EncodeRect(const rfb::Rect &rect,VSocket *outconn)
 		vnclog.Print(LL_INTERR, "no client back-buffer available in EncodeRect\n");
 		return 0;
 	}
-
+	if (zlib_encoder_in_use)
+	{
+		if (m_use_xor)
+		{
+		return m_encoder->EncodeRect(m_buffer->m_backbuff, m_buffer->m_cachebuff, outconn ,m_clientbuff, rect);
+		}
+		else return m_encoder->EncodeRect(m_buffer->m_backbuff, NULL, outconn ,m_clientbuff, rect);
+	}
+	
 	return m_encoder->EncodeRect(m_buffer->m_backbuff, m_clientbuff, rect);
 }
 

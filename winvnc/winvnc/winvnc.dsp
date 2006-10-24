@@ -196,6 +196,10 @@ SOURCE=.\vncdesktopthread.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\vncencodecorre.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\vncencodehext.cpp
 # End Source File
 # Begin Source File
@@ -205,6 +209,10 @@ SOURCE=.\vncencoder.cpp
 # Begin Source File
 
 SOURCE=.\vncencoderCursor.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\vncEncodeZlib.cpp
 # End Source File
 # Begin Source File
 
@@ -360,6 +368,10 @@ SOURCE=.\vncdesktopthread.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\vncencodecorre.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\vncencodehext.h
 # End Source File
 # Begin Source File
@@ -369,6 +381,10 @@ SOURCE=.\vncencodemgr.h
 # Begin Source File
 
 SOURCE=.\vncencoder.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vncEncodeZlib.h
 # End Source File
 # Begin Source File
 
