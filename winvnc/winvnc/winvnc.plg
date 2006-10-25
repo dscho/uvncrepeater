@@ -3,74 +3,286 @@
 <pre>
 <h1>Build Log</h1>
 <h3>
+--------------------Configuration: omnithread - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSPF.tmp" with contents
+[
+/nologo /MD /W3 /GX /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "__NT__" /D "_WINSTATIC" /D "__WIN32__" /D _WIN32_WINNT=0x400 /Fp"Release/omnithread.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\omnithread\nt.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSPF.tmp" 
+Creating command line "link.exe -lib /nologo /out:"Release\omnithread.lib"  .\Release\nt.obj "
+<h3>Output Window</h3>
+Compiling...
+nt.cpp
+Creating library...
+<h3>
+--------------------Configuration: rdr - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP10.tmp" with contents
+[
+/nologo /MD /W3 /GX /O1 /I ".." /I "../zlib" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/rdr.pch" /YX /Fo"Release/" /Fd"Release/" /FD /O3 /QaxM /Qip /Qsox- /c 
+"C:\VSS\Projects\UltraVNC_SC\trunk\rdr\FdInStream.cxx"
+"C:\VSS\Projects\UltraVNC_SC\trunk\rdr\FdOutStream.cxx"
+"C:\VSS\Projects\UltraVNC_SC\trunk\rdr\InStream.cxx"
+"C:\VSS\Projects\UltraVNC_SC\trunk\rdr\NullOutStream.cxx"
+"C:\VSS\Projects\UltraVNC_SC\trunk\rdr\ZlibInStream.cxx"
+"C:\VSS\Projects\UltraVNC_SC\trunk\rdr\ZlibOutStream.cxx"
+]
+Creating command line "cl.exe @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP10.tmp" 
+Creating command line "link.exe -lib /nologo /out:"Release\rdr.lib"  .\Release\FdInStream.obj .\Release\FdOutStream.obj .\Release\InStream.obj .\Release\NullOutStream.obj .\Release\ZlibInStream.obj .\Release\ZlibOutStream.obj "
+<h3>Output Window</h3>
+Compiling...
+Command line warning D4002 : ignoring unknown option '/O3'
+Command line warning D4002 : ignoring unknown option '/QaxM'
+Command line warning D4002 : ignoring unknown option '/Qip'
+Command line warning D4002 : ignoring unknown option '/Qsox-'
+FdInStream.cxx
+FdOutStream.cxx
+InStream.cxx
+NullOutStream.cxx
+ZlibInStream.cxx
+ZlibOutStream.cxx
+Creating library...
+<h3>
+--------------------Configuration: Xregion - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP11.tmp" with contents
+[
+/nologo /MD /W3 /GX /O1 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/Xregion.pch" /YX /Fo"Release/" /Fd"Release/" /FD /QaxWK /O3 /c 
+"C:\VSS\Projects\UltraVNC_SC\trunk\Xregion\Region.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP11.tmp" 
+Creating command line "link.exe -lib /nologo /out:"Release\Xregion.lib"  .\Release\Region.obj "
+<h3>Output Window</h3>
+Compiling...
+Command line warning D4002 : ignoring unknown option '/QaxWK'
+Command line warning D4002 : ignoring unknown option '/O3'
+Region.c
+Creating library...
+<h3>
+--------------------Configuration: zlib - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP12.tmp" with contents
+[
+/nologo /MD /W3 /GX /O1 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /Fp"Release/zlib.pch" /YX /Fo"Release/" /Fd"Release/" /FD /QaxWK /O3 /c 
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\adler32.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\compress.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\crc32.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\deflate.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\gzio.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\inffast.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\inflate.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\inftrees.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\trees.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\uncompr.c"
+"C:\VSS\Projects\UltraVNC_SC\trunk\zlib\zutil.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP12.tmp" 
+Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP13.tmp" with contents
+[
+/nologo /out:"Release\zlib.lib" 
+.\Release\adler32.obj
+.\Release\compress.obj
+.\Release\crc32.obj
+.\Release\deflate.obj
+.\Release\gzio.obj
+.\Release\inffast.obj
+.\Release\inflate.obj
+.\Release\inftrees.obj
+.\Release\trees.obj
+.\Release\uncompr.obj
+.\Release\zutil.obj
+]
+Creating command line "link.exe -lib @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP13.tmp"
+<h3>Output Window</h3>
+Compiling...
+Command line warning D4002 : ignoring unknown option '/QaxWK'
+Command line warning D4002 : ignoring unknown option '/O3'
+adler32.c
+compress.c
+crc32.c
+deflate.c
+gzio.c
+inffast.c
+inflate.c
+inftrees.c
+trees.c
+uncompr.c
+zutil.c
+Creating library...
+<h3>
 --------------------Configuration: winvnc - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSPAEC9.tmp" with contents
+Creating command line "rc.exe /l 0x809 /fo"..\Release/winvnc.res" /d "NDEBUG" "C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\winvnc.rc"" 
+Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP14.tmp" with contents
 [
 /nologo /MD /W3 /GX /Zi /O1 /I "..\omnithread" /I ".." /I "..\.." /D "NDEBUG" /D "__x86__" /D "__WIN32__" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D _WIN32_WINNT=0x501 /D "XMD_H" /D "_WINSTATIC" /D "SINGLECLICKULTRA" /D _WIN32_IE=0x0500 /D "DRIVER" /Fp"..\Release/winvnc.pch" /YX /Fo"..\Release/" /Fd"..\Release/" /FD /O3 /QaxWK /c 
-"C:\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\winvnc\winvnc.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\black_layered.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\buildtime.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\DSMPlugin\DSMPlugin.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\Dtwinver.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\HideDesktop.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\rfbRegion_X11.cxx"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\rfbUpdateTracker.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\stdhdrs.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\Test.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\TextChat.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\translate.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\videodriver.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\videodrivercheck.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncabout.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncbuffer.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncclient.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncdesktop.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncDesktopSW.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncdesktopthread.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncencodecorre.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncencodehext.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncencoder.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncencoderCursor.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncEncodeZlib.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncencodezrle.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncinsthandler.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vnckeymap.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vnclog.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncmenu.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncMultiMonitor.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncOSVersion.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncproperties.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncpropertiesPoll.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncserver.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncservice.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncsockconnect.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vsocket.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\winvnc.cpp"
+"C:\VSS\Projects\UltraVNC_SC\trunk\ZipUnZip32\ZipUnzip32.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSPAEC9.tmp" 
-Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSPAECA.bat" with contents
+Creating command line "cl.exe @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP14.tmp" 
+Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP15.bat" with contents
 [
 @echo off
 cl /nologo /MT /Fo..\Release\ /Fd..\Release\ /c buildtime.cpp
 ]
-Creating command line "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSPAECA.bat"
+Creating command line "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP15.bat"
+Compiling resources...
 Compiling...
 Command line warning D4002 : ignoring unknown option '/O3'
 Command line warning D4002 : ignoring unknown option '/QaxWK'
+black_layered.cpp
+buildtime.cpp
+DSMPlugin.cpp
+C:\VSS\Projects\UltraVNC_SC\trunk\DSMPlugin\DSMPlugin.cpp(297) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+C:\VSS\Projects\UltraVNC_SC\trunk\DSMPlugin\DSMPlugin.cpp(356) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+Dtwinver.cpp
+HideDesktop.cpp
+rfbRegion_X11.cxx
+..\..\Xregion/region.h(62) : warning C4005: 'MAXSHORT' : macro redefinition
+        C:\PROGRAM FILES\MICROSOFT PLATFORM SDK FOR WINDOWS SERVER 2003 R2\INCLUDE\winnt.h(822) : see previous definition of 'MAXSHORT'
+..\..\Xregion/region.h(63) : warning C4005: 'MINSHORT' : macro redefinition
+        C:\PROGRAM FILES\MICROSOFT PLATFORM SDK FOR WINDOWS SERVER 2003 R2\INCLUDE\winnt.h(821) : see previous definition of 'MINSHORT'
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\rfbRegion_X11.cxx(149) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+rfbUpdateTracker.cpp
+stdhdrs.cpp
+Test.cpp
+TextChat.cpp
+translate.cpp
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\tableinitcmtemplate.cpp(72) : warning C4018: '<' : signed/unsigned mismatch
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\tableinitcmtemplate.cpp(72) : warning C4018: '<' : signed/unsigned mismatch
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\tableinitcmtemplate.cpp(72) : warning C4018: '<' : signed/unsigned mismatch
+videodriver.cpp
+videodrivercheck.cpp
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\videodrivercheck.cpp(105) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+vncabout.cpp
+vncbuffer.cpp
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncbuffer.cpp(1094) : warning C4805: '==' : unsafe mix of type 'int' and type 'const bool' in operation
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncbuffer.cpp(1095) : warning C4805: '==' : unsafe mix of type 'int' and type 'const bool' in operation
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncbuffer.cpp(1096) : warning C4805: '==' : unsafe mix of type 'int' and type 'const bool' in operation
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncbuffer.cpp(1096) : warning C4805: '==' : unsafe mix of type 'int' and type 'const bool' in operation
+vncclient.cpp
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncclient.cpp(1260) : warning C4800: 'unsigned char' : forcing value to bool 'true' or 'false' (performance warning)
+vncdesktop.cpp
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncdesktop.cpp(431) : warning C4805: '==' : unsafe mix of type 'int' and type 'const bool' in operation
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncdesktop.cpp(1951) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+vncDesktopSW.cpp
+vncdesktopthread.cpp
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncdesktopthread.cpp(334) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncdesktopthread.cpp(468) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+C:\VSS\Projects\UltraVNC_SC\trunk\winvnc\winvnc\vncdesktopthread.cpp(834) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+vncencodecorre.cpp
+vncencodehext.cpp
+vncencoder.cpp
+vncencoderCursor.cpp
+vncEncodeZlib.cpp
+vncencodezrle.cpp
+vncinsthandler.cpp
+vnckeymap.cpp
+vnclog.cpp
+vncmenu.cpp
+vncMultiMonitor.cpp
+vncOSVersion.cpp
+vncproperties.cpp
+vncpropertiesPoll.cpp
+vncserver.cpp
+vncservice.cpp
+vncsockconnect.cpp
+vsocket.cpp
 winvnc.cpp
-Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSPAECB.tmp" with contents
+ZipUnzip32.cpp
+Creating temporary file "C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP16.tmp" with contents
 [
 wsock32.lib winmm.lib kernel32.lib user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib version.lib comctl32.lib /nologo /subsystem:windows /incremental:no /pdb:"..\Release/winvnc.pdb" /machine:I386 /out:"..\Release/winvnc.exe" 
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\black_layered.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\buildtime.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\DSMPlugin.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\Dtwinver.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\HideDesktop.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\rfbRegion_X11.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\rfbUpdateTracker.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\stdhdrs.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\Test.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\TextChat.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\translate.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\videodriver.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\videodrivercheck.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncabout.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncbuffer.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncclient.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncdesktop.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncDesktopSW.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncdesktopthread.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncencodehext.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncencoder.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncencoderCursor.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncencodezrle.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncinsthandler.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vnckeymap.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vnclog.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncmenu.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncMultiMonitor.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncOSVersion.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncproperties.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncpropertiesPoll.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncserver.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncservice.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncsockconnect.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vsocket.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\winvnc.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\ZipUnzip32.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\winvnc.res
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncencodecorre.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\Release\vncEncodeZlib.obj
-\VSS\Projects\VNC\UltraVNC_SC\trunk\winvnc\omnithread\Release\omnithread.lib
-\VSS\Projects\VNC\UltraVNC_SC\trunk\rdr\Release\rdr.lib
-\VSS\Projects\VNC\UltraVNC_SC\trunk\Xregion\Release\Xregion.lib
-\VSS\Projects\VNC\UltraVNC_SC\trunk\zlib\Release\zlib.lib
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\black_layered.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\buildtime.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\DSMPlugin.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\Dtwinver.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\HideDesktop.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\rfbRegion_X11.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\rfbUpdateTracker.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\stdhdrs.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\Test.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\TextChat.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\translate.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\videodriver.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\videodrivercheck.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncabout.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncbuffer.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncclient.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncdesktop.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncDesktopSW.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncdesktopthread.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncencodecorre.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncencodehext.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncencoder.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncencoderCursor.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncEncodeZlib.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncencodezrle.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncinsthandler.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vnckeymap.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vnclog.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncmenu.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncMultiMonitor.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncOSVersion.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncproperties.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncpropertiesPoll.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncserver.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncservice.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vncsockconnect.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\vsocket.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\winvnc.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\ZipUnzip32.obj
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\Release\winvnc.res
+\VSS\Projects\UltraVNC_SC\trunk\winvnc\omnithread\Release\omnithread.lib
+\VSS\Projects\UltraVNC_SC\trunk\rdr\Release\rdr.lib
+\VSS\Projects\UltraVNC_SC\trunk\Xregion\Release\Xregion.lib
+\VSS\Projects\UltraVNC_SC\trunk\zlib\Release\zlib.lib
 ]
-Creating command line "link.exe @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSPAECB.tmp"
+Creating command line "link.exe @C:\DOCUME~1\jarrod\LOCALS~1\Temp\RSP16.tmp"
 
 buildtime.cpp
 <h3>Output Window</h3>
@@ -80,7 +292,7 @@ LINK : warning LNK4098: defaultlib "LIBCMT" conflicts with use of other libs; us
 
 
 <h3>Results</h3>
-winvnc.exe - 0 error(s), 3 warning(s)
+winvnc.exe - 0 error(s), 30 warning(s)
 </pre>
 </body>
 </html>
