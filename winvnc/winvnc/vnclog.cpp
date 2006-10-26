@@ -181,7 +181,7 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 	}
 
 	// - Write the log message, safely, limiting the output buffer size
-	TCHAR line[LINE_BUFFER_SIZE];
+	TCHAR line[(LINE_BUFFER_SIZE * 2) + 1]; // sf@2006 - Prevents buffer overflow
 	TCHAR szErrorMsg[LINE_BUFFER_SIZE];
 	DWORD  dwErrorCode = GetLastError();
 	SetLastError(0);

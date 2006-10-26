@@ -163,6 +163,13 @@ static BOOL		ADWasEnabled = false;
 void HideDesktop()
 {
 	GetProfileString("Desktop", "Pattern", "0 0 0 0 0 0 0 0", DesktopPattern, sizeof(DesktopPattern));
+
+	// @@@efh Setting the desktop pattern via pvParam works, but is undocumented (except by www.winehq.com)
+	SystemParametersInfo(SPI_SETDESKPATTERN, 0, "0 0 0 0 0 0 0 0", SPIF_SENDCHANGE);
+
+	// Tell all applications that there is no wallpaper
+	// Note that this doesn't change the wallpaper registry setting!
+	// @@@efh On Win98 and Win95 this returns an error in the debug build (but not in release)...
 	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, "", SPIF_SENDCHANGE);
 
 	ADWasEnabled = HideActiveDesktop();
@@ -174,4 +181,6 @@ void RestoreDesktop()
 		ShowActiveDesktop();
 
 	SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, NULL, SPIF_SENDCHANGE);
+
+	SystemParametersInfo(SPI_SETDESKPATTERN, 0, DesktopPattern, SPIF_SENDCHANGE);
 }

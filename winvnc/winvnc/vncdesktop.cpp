@@ -1727,6 +1727,27 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 	switch (iMsg)
 	{
+	///ddihook
+	case WM_SYSCOMMAND:
+		// User has clicked an item on the tray menu
+		switch (wParam)
+		{
+			case SC_MONITORPOWER:
+				vnclog.Print(LL_INTINFO, VNCLOG("Monitor2 %i\n"),lParam);
+		}
+		vnclog.Print(LL_INTINFO, VNCLOG("Monitor3 %i %i\n"),wParam,lParam);
+		return DefWindowProc(hwnd, iMsg, wParam, lParam);
+	case WM_POWER:
+	case WM_POWERBROADCAST:
+		// User has clicked an item on the tray menu
+		switch (wParam)
+		{
+			case SC_MONITORPOWER:
+				vnclog.Print(LL_INTINFO, VNCLOG("Monitor2 %i\n"),lParam);
+		}
+		vnclog.Print(LL_INTINFO, VNCLOG("Power3 %i %i\n"),wParam,lParam);
+		return DefWindowProc(hwnd, iMsg, wParam, lParam);
+
 	case WM_COPYDATA:
 			_this->pMyCDS= (PCOPYDATASTRUCT) lParam;
 			if (_this->pMyCDS->dwData==112233)
