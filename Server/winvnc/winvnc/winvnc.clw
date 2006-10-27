@@ -11,13 +11,13 @@ LastPage=0
 ClassCount=1
 
 ResourceCount=8
-Resource1=IDD_PROPERTIES1
-Resource2=IDD_ABOUT
-Resource3=IDD_PROPERTIES
-Resource4=IDC_TITLEWINDOW_SMALL
-Resource5=IDD_TEXTCHAT_DLG
-Resource6=IDD_ENTERID (Neutral)
-Resource7=IDC_TITLEWINDOW
+Resource1=IDD_PROPERTIES
+Resource2=IDD_ENTERID (Neutral)
+Resource3=IDD_ABOUT
+Resource4=IDD_TEXTCHAT_DLG
+Resource5=IDC_TITLEWINDOW
+Resource6=IDC_TITLEWINDOW_SMALL
+Resource7=IDD_PROPERTIES1
 Class1=IdDialog
 Resource8=IDR_TRAYMENU
 

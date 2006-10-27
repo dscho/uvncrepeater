@@ -1,0 +1,973 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * FVNC: A VNC Client for Flash Player 9 and above
+ * Copyright (C) 2005-2006 Darron Schall <darron@darronschall.com>
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ * 02111-1307 USA
+-->
+<mx:TitleWindow
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="100%" height="100%"
+	showCloseButton="true"
+	creationComplete="initializeComponents();"
+	close="handleDisconnect();">
+	
+	<mx:Script>
+		<![CDATA[
+			import fvnc.rfb.*;
+			import fvnc.events.*;
+			import fvnc.rfb.constants.*;
+			import flash.events.*;
+			import flash.errors.*;
+			import flash.geom.*;
+			import flash.display.*;
+			import flash.utils.*;
+			import flash.ui.*
+			import mx.containers.TitleWindow;
+			import mx.core.UIComponent;
+	
+			// A reference to the remote settings on the server, including name,
+			// screen height, and pixel format.
+			private var _settings:Object;
+			
+			// A reference to an open RFB socket ready to process client/server
+			// messages ( assuming the handshaking phase is already complete )
+			private var _rfb:RFBProtocol;
+			
+			// Because we're dealing with asynchronous sockets, its challenging
+			// to write a method to just interpret the data as it becoems
+			// available for 2 reasons - #1, theres a good chance we'll run out
+			// of data to process before we're done processing and #2, theres
+			// no easy way to tell how much data we need available before processing
+			// because we need to at least do some processing first.  So, what we'll
+			// do is store the data from onSocketData into a buffer, and then just
+			// try and act on the buffer and if we fail, we'll start over after we 
+			// receive more data later on in time.
+			private var buffer:RFBBufferedReader;
+			
+			// Use the double-buffering technique to speed up data
+			// display - draw in offScreenPixels, then copy to
+			// onScreenPixles which is attached to screenImage on
+			// the DispalyList so things get updated visually.
+			// TODO: Favor lock/unlock instead of the double buffering
+			// approach.
+			private var screenImage:Bitmap;
+			private var onScreenPixels:BitmapData;
+			private var offScreenPixels:BitmapData;
+			
+			// The rectangle that defines the screen bounds to
+			// be used for frame buffer updates
+			private var screenBounds:Rectangle;
+			
+			// Because all of the update rectangle encoding is
+			// carried out by a specific "draw" method, we'll create
+			// an object to map encoding type to the method used
+			// for decoding.  This will improve performance over
+			// a nested if ( encoding == ... ) or switch (encoding)
+			// statement.
+			private var encodingMap:Object;
+			
+			// Values for color shift when calculating real pixel value
+			private var redShift:int;
+			private var greenShift:int;
+			private var blueShift:int;
+	
+			/**
+			 * Sets the RFB Protocol that this panel is going to get its data from.  It
+			 * is assumed that all of the handshaking is already "complete" and the protocol
+			 * is ready to send/receive data normally.
+			 */
+			public function set rfb( rfb:RFBProtocol ):void
+			{
+				_rfb = rfb;
+			}
+			
+			/**
+			 * Sets the remove server settings of the server on the other end of the socket.
+			 */
+			public function set settings( serverInit:Object ):void
+			{
+				_settings = serverInit;
+				
+				// Set the title of the panel to the name of the server we connected to
+				this.title = _settings.name;
+				
+				// Configure the remoteScreen component to have a width and height to 
+				// match that of the remote server
+				remoteScreen.width = _settings.frameBufferWidth;
+				remoteScreen.height = _settings.frameBufferHeight;
+			}
+			
+			/**
+			 * Runs initialization when the panel is first created and displayed.
+			 */
+			protected function initializeComponents():void
+			{
+				// Whenever we receive data over the socket, fire off the onSocketData method
+				_rfb.addEventListener( ProgressEvent.SOCKET_DATA, onSocketData );
+				
+				// Whenever the player tries to draw a frame, attempt to process a server message
+				// to update the screen (chances are the message is a frame buffer update)
+				addEventListener( Event.ENTER_FRAME, attemptToProcessServerMessage );
+				
+				// Create a list of supported encodings, in the order of preference
+				var encodings:Array = [ /*Encoding.ZLIBHEX, Encoding.ZRLE,*/ Encoding.HEXTILE, Encoding.COPY_RECT, Encoding.RRE, Encoding.RAW ];
+				
+				// Tell the VNC Server our encoding preferences
+				_rfb.writeSetEncodings( encodings );
+				
+				// Set up the encoding map to map encoding type to decoding method
+				// TODO: This needs to be refactored into separate classes that know
+				// how to deal with the various encodings
+				encodingMap = new Object();
+				encodingMap[ Encoding.RAW ] = drawRawRectangle;
+				encodingMap[ Encoding.RRE ] = drawRRERectangles;
+				encodingMap[ Encoding.COPY_RECT ] = drawCopyRectangle;
+				encodingMap[ Encoding.HEXTILE ] = drawHexTileRectangles;
+				encodingMap[ Encoding.ZLIBHEX ] = drawZlibHexRectangles;
+				encodingMap[ Encoding.ZRLE ] = drawZRLERectangles;
+				
+				// Force a 16-bit pixel format
+				// TODO: Let the user configure this
+				var pixelFormat:PixelFormat = new PixelFormat();
+				pixelFormat.bitsPerPixel = 16;
+				pixelFormat.depth = 15;
+				pixelFormat.bigEndian = true;
+				pixelFormat.trueColor = true;
+				pixelFormat.redMax = 31;
+				pixelFormat.redShift = 10;
+				pixelFormat.greenMax = 31;
+				pixelFormat.greenShift = 5;
+				pixelFormat.blueMax = 31;
+				pixelFormat.blueShift = 0;
+				
+				// Based on the max color values, calculate colors to use
+				calculateColors( pixelFormat.redMax, pixelFormat.greenMax, pixelFormat.blueMax );
+				
+				// Let the server know the pixel format we're using
+				_rfb.writeSetPixelFormat( pixelFormat );
+				
+				// Save the pixel format in the server settings
+				_settings.pixelFormat = pixelFormat;
+				
+				// Create the bitmap that we'll perform calculations on
+				offScreenPixels = new BitmapData( _settings.frameBufferWidth, 
+											   	  _settings.frameBufferHeight, 
+											   	  false ); // not transparent
+											   	  
+				// This is a copy of the onScreenPixels - we copyPixels from
+				// offScreen to onScreen to speed up display of bitmap data
+				onScreenPixels = new BitmapData(  _settings.frameBufferWidth, 
+											   	  _settings.frameBufferHeight, 
+											   	  false ); // not transparent					   
+											   	  
+				// The onScreenPixels are the ones attached to the DisplayList ( screen )
+				screenImage = new Bitmap( onScreenPixels );
+				remoteScreen.addChild( screenImage );
+	
+				// Every time we update the frame buffer, we'll ask to update the frame buffer
+				// again, which means we need to send the bounds rectangle.  So, we'll save
+				// the screen bounds as a rectangle for re-use in asking for the updates.
+				screenBounds = new Rectangle( 0, 0, 
+										_settings.frameBufferWidth,
+										_settings.frameBufferHeight );
+							
+				
+				// Create a new buffered reader to we can process the server messages easier
+				buffer = new RFBBufferedReader();
+				
+				// Store the number of bytes per pixel based on the pixelFormat we receive
+				// from the server.  We store the value because it's used a lot and storing
+				// it will be quicker than trying to calculate it every time
+				buffer.bytesPerPixel = _settings.pixelFormat.bitsPerPixel / 8;
+				// The endian format for the pixels is important so that we read the pixel
+				// values correctly.
+				buffer.pixelEndian = _settings.pixelFormat.bigEndian ? Endian.BIG_ENDIAN : Endian.LITTLE_ENDIAN;
+				
+				// Request the initial screen from the server
+				_rfb.writeFrameBufferUpdateRequest( screenBounds, false);
+				
+				// Whenever the mouse moves, let the server know
+				remoteScreen.addEventListener( MouseEvent.MOUSE_MOVE, handleMouseEvent );
+				remoteScreen.addEventListener( MouseEvent.MOUSE_DOWN, handleMouseEvent );
+				remoteScreen.addEventListener( MouseEvent.MOUSE_UP, handleMouseEvent );
+				remoteScreen.addEventListener( MouseEvent.MOUSE_WHEEL, handleMouseEvent );
+				
+				// Whenever a key is pressed, let the server know
+				remoteScreen.addEventListener( KeyboardEvent.KEY_UP, handleKeyUp );
+				remoteScreen.addEventListener( KeyboardEvent.KEY_DOWN, handleKeyDown );
+				// In order to receive key events, we need to set the focus first to the
+				// remote screen
+				stage.focus = remoteScreen;
+			}
+			
+			/**
+			 * Event handler:  Called when data is received from the socket
+			 */
+			private function onSocketData( pe:ProgressEvent ):void
+			{
+				// Append everything we can from the _rfb socket into our buffer
+				_rfb.readBytes( buffer, buffer.length );
+			}
+			
+			/**
+			 * Event handler:  Called when we receive some sort of interaction from
+			 * the mouse.  We'll pass the mouse interaction over RFB to the remote server.
+			 */
+			private function handleMouseEvent( event:MouseEvent ):void
+			{
+				// Send the mouse event to the server
+				_rfb.writePointerEvent( event );
+			}
+			
+			/**
+			 * Event handler:  Called when we receive a key release.  Send the event
+			 * over RFB to the remote server.
+			 */
+			private function handleKeyUp( event:KeyboardEvent ):void
+			{
+				// Prevent the key event from bubbling up the UI.  This is importnt
+				// as, for example, if we press the "up" arrow key the remoteScreen
+				// might think we're pressing "up" to move the scrollbars up if 
+				// they are displayed.  We don't want this side effect, so stopping
+				// the event at this level prevents anyone else from handling it.
+				event.stopPropagation();
+				_rfb.writeKeyUpEvent( event );	
+			}
+			
+			/**
+			 * Event handler:  Called when we receive a key release.  Send the event
+			 * over RFB to the remote server.
+			 */
+			private function handleKeyDown( event:KeyboardEvent ):void
+			{
+				// Prevent the key event from bubbling up the UI.  This is importnt
+				// as, for example, if we press the "up" arrow key the remoteScreen
+				// might think we're pressing "up" to move the scrollbars up if 
+				// they are displayed.  We don't want this side effect, so stopping
+				// the event at this level prevents anyone else from handling it.
+				event.stopPropagation();
+				_rfb.writeKeyDownEvent( event );
+			}
+			
+			/**
+			 * Event handler:  Called whenever the player tries to draw a frame.  This
+			 * will inspect the buffer and try to process the message from the server
+			 * ( which is most likely a frame buffer update that causes changes to
+			 * the screen )
+			 */
+			private function attemptToProcessServerMessage( event:Event ):void
+			{
+				// Wrap this in a try catch block because the process method is
+				// probbaly going to fail (since theres a good chance not enough
+				// data is available to complete the screen rendering).
+				try
+				{
+					// Process the message we received from the server.. this may
+					// or may not work, who knows!
+					processServerMessage();	
+				}
+				catch( eof:EOFError )
+				{
+					// Ignore the error, it just means we didn't have enough
+					// data in the buffer to finish the process message call
+				}
+				catch( e:Error )
+				{
+					// Any other error, I'd like to see what it is...
+					trace( e.message );
+					trace( e.getStackTrace() );	
+				}
+			}
+			
+			/**
+			 * The "brains" of the RFB protocol - this will look for server
+			 * messages and update the client based on what the server tells
+			 * us to do.
+			 */
+			private function processServerMessage( ):void
+			{
+				// Reset the buffer position and try to process a message
+				// in its entireity again.
+				buffer.position = 0;
+				
+				// The first element is the message type, so let's see what it is..
+				var messageType:int = buffer.readServerMessageType();
+				
+				// Determine the type to act accordingly
+				switch ( messageType ) {
+					
+					// The server is telling us we need to update the screen - what follows
+					// will depend on the amount of screen changes and the encoding used.
+					case Server.FRAMEBUFFER_UPDATE:
+						// Get the number of rectangles that need to be drawn
+						var numRects:int = buffer.readFrameBufferUpdate();
+						
+						// A variable that will contain a reference to the current rectangle
+						// being updated by the drawing methods
+						var updateRect:Rectangle;
+						
+						// The type of encoding used for the update rectangle
+						var encoding:int;
+						
+						// Loop over all of the rectangles that need updating
+						for ( var i:int = 0; i < numRects; i++ )
+						{
+							// Get the coordinates (x,y,width,height) where the update is needed
+							updateRect = buffer.readRectangle();
+							
+							// Get the specific encoding for this update rectangle
+							encoding = buffer.readFrameBufferUpdateRectangleEncoding();
+							
+							// Depending on the encoding, we need to handle the update differently,
+							// so examing the encoding and act based on it's value.  Use the encoding
+							// map to get the decoding function, and pass along the rectangle that
+							// needs to be drawn
+							encodingMap[ encoding ]( updateRect );
+						}
+				
+						// Once the update is done drawing, we ask for
+						// the frame buffer to update again, making sure
+						// to ask for the update incrementally so we 
+						// don't get updated with the whole screen.
+						_rfb.writeFrameBufferUpdateRequest( screenBounds, true );
+						break;
+						
+					
+					// Process the set color map entries message
+					case Server.SET_COLOR_MAP_ENTRIES:
+						// TODO: Write me...
+						trace( "SERVER: Set color map entries" );
+						break;
+						
+					// Process the bell message
+					case Server.BELL:
+						// TODO: Write me..  This will probably involve creating
+						// a bell .wav sound and just playing it here.
+						trace( "SERVER: Bell" );
+						break;	
+				
+					// Process the cut text message
+					case Server.CUT_TEXT:
+						var text:String = buffer.readServerCutText();
+						trace( "SERVER: Cut text: " + text );
+						break;
+			
+				}
+				
+				// If we got here then we successfully read a complete message, so remove
+				// it from the front of the byte array buffer to save memory.  Failure to
+				// do so will mean that the buffer just keeps getting bigger and bigger
+				// and eventually we're going to consume too much memory.
+				
+				// Create a new buffer
+				var newBuffer:RFBBufferedReader = new RFBBufferedReader();
+				// Save the values from the current buffer
+				newBuffer.bytesPerPixel = buffer.bytesPerPixel;
+				newBuffer.pixelEndian = buffer.pixelEndian;
+				// Read everything that hasn't been processed from the buffer into the new buffer
+				buffer.readBytes( newBuffer );
+				// Get rid of the old buffer and use the new one in it's place
+				buffer = newBuffer;
+			}
+			
+			/**
+			 * Event handler:  Called when the close button is clicked on the panel 
+			 * to disconnect from the remote server.
+			 */
+			protected function handleDisconnect():void
+			{
+				// Let anyone interested know that we're closing...
+				dispatchEvent( new Event( Event.CLOSE ) );
+			}
+			
+			/**
+			 * Calculate color values, the amount we need to shift by in order to
+			 * display the pixel data correctly.
+			 */
+			private function calculateColors( redMax:int, greenMax:int, blueMax:int ):void
+			{
+				var t:int = 0;
+				for ( t = 0; t < 32; t++ )
+				{
+					if ( ( ( 1 << t ) & redMax ) == 0 )
+					{
+						break;
+					}
+				}
+				redShift = 24 - t;
+				
+				for ( t = 0; t < 32; t++ )
+				{
+					if ( ( ( 1 << t ) & greenMax ) == 0 )
+					{
+						break;
+					}
+				}
+				greenShift = 16 - t;
+				
+				for ( t = 0; t < 32; t++ )
+				{
+					if ( ( ( 1 << t ) & greenMax ) == 0 )
+					{
+						break;
+					}
+				}
+				blueShift = 8 - t;
+			}
+			
+			/**
+			 * Based on the pixelFormat, this method will convert the
+			 * data for a pixel into an actual RGB color value to display.
+			 */
+			private function convertPixelData( data:uint ):uint
+			{
+				var pf:PixelFormat = _settings.pixelFormat;
+								
+				if ( pf.trueColor )
+				{
+					return ( ( ( data >> pf.redShift ) & pf.redMax ) << redShift )
+						| ( ( ( data >> pf.greenShift ) & pf.greenMax ) << greenShift )
+						| ( ( ( data >> pf.blueShift ) & pf.blueMax ) << blueShift )
+						
+						
+				}
+				
+				return 0;
+			}
+			
+			/**
+			 * Processes a raw encoding response in a frame buffer
+			 * update server message.
+			 */
+			private function drawRawRectangle( destRect:Rectangle ):void
+			{
+				// For a performance boost, throw an error if there isn't enough
+				// data in the buffer, since in this method we know how much
+				// data we need before continuing...
+				if ( destRect.width * destRect.height * buffer.bytesPerPixel > buffer.bytesAvailable )
+				{
+					throw new EOFError();
+				}
+				
+				var x:int;
+				var y:int;
+				var pixel:uint;
+				
+				// Raw rectangles are just a sequence of pixel values going from left to
+				// right and top to bottom
+				for ( y = 0; y < destRect.height; y++ )
+				{
+					for ( x = 0; x < destRect.width; x++ )
+					{
+						pixel = convertPixelData( buffer.readPixelData() );
+						offScreenPixels.setPixel( x + destRect.x, y + destRect.y, pixel );
+					}
+				}
+				
+				// Done manipulating the off screen pixels, so copy them to the on
+				// screen set to update the display
+				onScreenPixels.copyPixels( offScreenPixels, destRect, new Point( destRect.x, destRect.y ) );
+			}
+			
+			/**
+			 * Processes a copy rectangle encoding response in 
+			 * a frame buffer update server message
+			 */
+			private function drawCopyRectangle( destRect:Rectangle ):void
+			{
+				// Copy rect encoding is easy - there's a point specified
+				// that marks the upper left corner of a rectangle that 
+				// we'll use as the data
+				var srcPt:Point = buffer.readPoint();
+				// Use the width and height of the destination rectangle
+				// to construct the source rectangle with the correct source point
+				var srcRect:Rectangle = new Rectangle( srcPt.x, srcPt.y, 
+														destRect.width, destRect.height );
+				// The destination of the source rectangle is the x and y location
+				// of the restination rectangle
+				var destPt:Point = new Point( destRect.x, destRect.y );
+				
+				// Copy the rectangle
+				offScreenPixels.copyPixels( offScreenPixels, srcRect, destPt );
+				
+				// Update the screen
+				onScreenPixels.copyPixels( onScreenPixels, srcRect, destPt );	
+			}
+			
+			/**
+			 * Draws the frame buffer update via rise and run encoding
+			 */
+			private function drawRRERectangles( destRect:Rectangle ):void
+			{
+				// Get the number of sub rectangles that need to be drawn
+				// inside of the destination rectangle
+				var numSubRects:uint = buffer.readRreSubRectangles();
+				// For a performance boost, throw an error if there isn't enough
+				// data in the buffer, since in this method we know how much
+				// data we need before continuing...  8 here comes from the fact
+				// that the rectangle is described in RRE via 8 bytes
+				if ( numSubRects * ( 8 + buffer.bytesPerPixel ) > buffer.bytesAvailable )
+				{
+					throw new EOFError();
+				}
+				
+				// Read the background color value - call the variable pixel
+				// since we'll re-use it later for the foreground color
+				var pixel:uint = uint( buffer.readPixelData() );
+				// Fill in the destination rectangle with the background color
+				offScreenPixels.fillRect( destRect, pixel );
+					
+				// Loop over all of the update rectangles to color them
+				var subRect:Rectangle;
+				for ( var i:int = 0; i < numSubRects; i++ )
+				{
+					// Read the foreground pixel color
+					pixel = convertPixelData( buffer.readPixelData() );
+					// Read the coordinates of the sub rectangle
+					subRect = buffer.readRectangle();
+					// Adjust the x and y to the "screen" coordinates so
+					// the fillRect call completes correctly
+					subRect.x += destRect.x;
+					subRect.y += destRect.y;
+					// Fill in the rectangle with the foreground pixel color
+					offScreenPixels.fillRect( subRect, pixel );
+				}
+				
+				// Done with the update, copy all of the pixels to the on screen buffer
+				onScreenPixels.copyPixels( offScreenPixels, destRect, new Point( destRect.x, destRect.y ) );
+			}
+			
+			/**
+			 * Draws the frame buffer update via hextile encoding. Rectangles
+			 * are split up into 16x16 tile.
+			 */
+			private function drawHexTileRectangles( destRect:Rectangle ):void {
+				// Loop counters to draw tiles
+				var xLoc:int;
+				var yLoc:int;
+				
+				// Width and height of tiles - could be less than 16
+				// towards the bottom/right edges of the dest Rect
+				var tileWidth:int;
+				var tileHeight:int;
+				
+				// Speed up loops by pulling limit calculations outside
+				var maxX:int = destRect.x + destRect.width;
+				var maxY:int = destRect.y + destRect.height;
+				
+				// Store background/foreground colors as they might not
+				// change between loop iterations
+				var background:uint = 0;
+				var foreground:uint = 0;
+				
+				// Loop over the tiles available
+				for ( yLoc = destRect.y ; yLoc < maxY; yLoc += 16 )
+				{
+					for ( xLoc = destRect.x ; xLoc < maxX; xLoc += 16 )
+					{
+						// Assume we can update a full 16x16 tile
+						tileWidth = tileHeight = 16;
+						
+						// Check to make sure we don't go past the bounds
+						if ( maxX - xLoc < 16 )
+						{
+							tileWidth = maxX - xLoc;	
+						}
+						if ( maxY - yLoc < 16 )
+						{
+							tileHeight = maxY - yLoc;	
+						}
+						
+						var subEncodingMask:int = buffer.readHexTileSubEncodingMask();
+						
+						// When a tile is encoded as RAW, this takes precedence
+						if ( subEncodingMask & HexTile.RAW )
+						{
+							drawRawRectangle( new Rectangle( xLoc, yLoc, tileWidth, tileHeight ) );
+							// Raw tile drawn, move on to the next tile
+							continue;
+						}
+						
+						// Read the background color if specified, if not we 
+						// use the value from the previous loop iteration
+						if ( subEncodingMask & HexTile.BACKGROUND_SPECIFIED )
+						{
+							background = convertPixelData( buffer.readPixelData() );
+						}
+						
+						// Fill the background color
+						offScreenPixels.fillRect( new Rectangle( xLoc, yLoc, tileWidth, tileHeight), background );
+						
+						// Read the foreground color if specified, if not we 
+						// use the value from the previous loop iteration
+						if ( subEncodingMask & HexTile.FOREGROUND_SPECIFIED )
+						{
+							foreground = convertPixelData( buffer.readPixelData() );
+						}
+						
+						// If there are no sub rectangles, theres nothing else to draw
+						// (we probably only needed to fill the background), so
+						// we can move on to the next tile.
+						if ( ( subEncodingMask & HexTile.ANY_SUBRECTS ) == 0 )
+						{
+							continue;
+						}
+						
+						var numSubRects:int = buffer.readHexTileSubRectangles();
+						
+						var n:int;
+						var subRectDest:Rectangle
+						// Determine how to color the sub rectangles
+						if ( subEncodingMask & HexTile.SUBRECTS_COLORED )
+						{
+							for ( n = 0; n < numSubRects; n++ )
+							{
+								// Each sub rectangle has a pixel value before it
+								var pixel:uint = convertPixelData( buffer.readPixelData() );
+								subRectDest = buffer.readHexTileSubRectangle();
+								// Adjust the x and y to the "screen" coordinates so
+								// the fillRect call completes correctly
+								subRectDest.x += xLoc;
+								subRectDest.y += yLoc;
+								// Fill in the rectangle with the foreground pixel color
+								offScreenPixels.fillRect( subRectDest, pixel );
+							}	
+						}
+						else
+						{
+							// The sub rectangles don't have their own color, so just
+							// use the foreground color we read a little ways back.						
+							for ( n = 0; n < numSubRects; n++ )
+							{
+								// No pixel value, so we read the rectangle right away
+								subRectDest = buffer.readHexTileSubRectangle();
+								// Adjust the x and y to the "screen" coordinates so
+								// the fillRect call completes correctly
+								subRectDest.x += xLoc;
+								subRectDest.y += yLoc;
+								// Fill in the rectangle with the foreground pixel color
+								offScreenPixels.fillRect( subRectDest, foreground );
+							}	
+						}
+					}
+				}
+				
+				// Done with the update, copy all of the pixel
+				// data to the on screen buffer
+				onScreenPixels.copyPixels( offScreenPixels, destRect, new Point( destRect.x, destRect.y ) );
+				
+			}
+			
+			/**
+			 * Draws the frame buffer update via ZlibHex encoding
+			 */
+			private function drawZlibHexRectangles( destRect:Rectangle ):void
+			{
+				var length:uint = buffer.readUnsignedInt();
+				// Read the ZLib data
+				var data:ByteArray = new ByteArray();
+				buffer.readBytes( data, 0, length );
+				
+				// Uncompress the data
+				data.uncompress();
+				
+				drawHexTileRectangles( destRect );
+			}
+			
+			/**
+			 * Draws the frame buffer update via ZRLE encoding
+			 */
+			private function drawZRLERectangles( destRect:Rectangle ):void
+			{
+				var length:uint = buffer.readUnsignedInt();
+				// Read the ZLib data
+				var data:ByteArray = new ByteArray();
+				buffer.readBytes( data, 0, length );
+				
+				// Uncompress the data
+				data.uncompress();
+				
+				// Loop counters to draw tiles
+				var xLoc:int;
+				var yLoc:int;
+				
+				// Width and height of tiles - could be less than 16
+				// towards the bottom/right edges of the dest Rect
+				var tileWidth:int;
+				var tileHeight:int;
+				
+				// Speed up loops by pulling limit calculations outside
+				var maxX:int = destRect.x + destRect.width;
+				var maxY:int = destRect.y + destRect.height;
+				
+				// Array containing color palette information
+				var palette:Array;
+				
+				// Misc looping variables
+				var i:int;
+				var j:int;
+				
+				// Loop over the tiles available
+				for ( yLoc = destRect.y ; yLoc < maxY; yLoc += 64 )
+				{
+					for ( xLoc = destRect.x ; xLoc < maxX; xLoc += 64 )
+					{
+						// Assume we can update a full 64x64 tile
+						tileWidth = tileHeight = 64;
+						
+						// Check to make sure we don't go past the bounds
+						if ( maxX - xLoc < 64 )
+						{
+							tileWidth = maxX - xLoc;	
+						}
+						if ( maxY - yLoc < 64 )
+						{
+							tileHeight = maxY - yLoc;	
+						}
+						
+						var subEncodingMask:int = buffer.readUnsignedByte();
+						// Flag to determine if data is Run-Length Encoded
+						var rle:Boolean = ( subEncodingMask & 0x80 ) == 0x80;
+						// Size of the palette used
+						var paletteSize:int = subEncodingMask & 0x7F;
+						
+						// At the most, palette will have 128 entries
+						palette = new Array( 128 );
+						// Read the palette data
+						for ( i = 0; i < paletteSize; i++ )
+						{
+							palette[i] = buffer.readCompressedPixelData();
+						}
+						
+						if ( paletteSize == 1 )
+						{
+							// Solid tile consisting of a single color
+							offScreenPixels.fillRect( new Rectangle( xLoc, yLoc, tileWidth, tileHeight), palette[ 0 ] );
+						}
+						
+						var byte:int;
+						var index:int;  // The location of the color in the palette
+								
+						if ( !rle ) {
+							if ( paletteSize == 0 )
+							{
+								// Raw pixel data
+								drawRawRectangle( new Rectangle( xLoc, yLoc, tileWidth, tileHeight ) );
+							}
+							else
+							{
+								// Packed palette types
+								
+								var bitsPerPaletteIndex:int;
+								
+								if ( paletteSize > 4 )
+								{
+									bitsPerPaletteIndex = 4;
+								}
+								else if ( paletteSize > 2 )
+								{
+									bitsPerPaletteIndex	= 2;
+								}
+								else
+								{
+									bitsPerPaletteIndex = 1;	
+								}
+								
+								// The byte contains the indexes
+								byte = 0;
+								// Bit mask to know what we're looking at
+								var bits:int = 0; 
+																
+								for ( i = 0; i < tileHeight; i++ )
+								{
+									for ( j = 0; j < tileWidth; j++ )
+									{
+										// Read another byte if we run out of bits
+										if ( bits == 0 )
+										{
+											byte = buffer.readUnsignedByte();
+											bits = 8;
+										}
+										// Remove the bits that we're reading
+										bits -= bitsPerPaletteIndex;
+										// Get the index in the palette
+										index = ( byte >> bits ) & ( ( 1 << bitsPerPaletteIndex ) - 1 ) & 0x7F;
+										// Colorize the pixel
+										offScreenPixels.setPixel( xLoc, yLoc + i, palette[ index ] );
+									}
+								}
+							}
+						}
+						else
+						{
+							
+							var currentPixel:int;
+							var totalPixels:int;
+							var runX:int;
+							var runY:int;
+							var runLength:int;
+							var pixel:uint;		// pixel color
+							
+							if ( paletteSize == 0 ) // Plain RLE
+							{
+								currentPixel = 0;
+								totalPixels = tileWidth * tileHeight;
+								while ( currentPixel < totalPixels ) 
+								{
+									// Get the pixel color
+									pixel = buffer.readCompressedPixelData();
+									
+									// Calculate how long the pixel color runs.
+									runLength = 1; // Note the 1 here, as length is 1 greater
+														   // then sum of byte values
+									byte = 0;
+									do
+									{
+										byte = buffer.readUnsignedByte();
+										runLength += byte;
+									} while ( byte == 0xFF );
+																	
+									// Instead of doing setPixel for every pixel accounted for
+									// by the run length, we split up the run into separate rectangles
+									// that we can fill (which will speed up the drawing a bit)
+									runX = currentPixel % tileWidth;
+									runY = currentPixel / tileWidth;
+									
+									currentPixel += runLength;
+									
+									// Check to see if we need to run onto the next line at all
+									if ( runX + runLength > tileWidth )
+									{
+										// Check to make sure we can run along the line horizontally
+										if ( runX != 0 )
+										{
+											offScreenPixels.fillRect( new Rectangle( xLoc + runX, yLoc + runY, tileWidth - runX, 1 ), pixel );
+											runLength -= tileWidth - runX;
+											runX = 0;
+											runY++;
+										}
+										
+										// Run onto the next line
+										if ( runLength > tileWidth )
+										{
+											offScreenPixels.fillRect( new Rectangle( xLoc, yLoc + runY, tileWidth, runLength / tileWidth ), pixel );
+											runY += runLength / tileWidth;
+											runLength = runLength % tileWidth;
+										}
+									}
+									
+									// Handle the remaining pixels
+									if ( runLength != 0 )
+									{
+										offScreenPixels.fillRect( new Rectangle( xLoc + runX, yLoc + runY, runLength, 1 ), pixel );
+									}
+									
+								}
+								
+							}
+							else // Palette RRE	
+							{
+								currentPixel = 0;
+								totalPixels = tileWidth * tileHeight;
+								while ( currentPixel < totalPixels )
+								{
+									index = buffer.readUnsignedByte();
+									
+									runLength = 1; // Note the 1 here, as length is 1 greater
+														   // then sum of byte values
+									// The top bit indicates if a run length is more than 1
+									if ( index & 0x80 )
+									{
+										// Calculate how long the pixel color runs.
+										byte = 0;
+										do
+										{
+											byte = buffer.readUnsignedByte();
+											runLength += byte;
+										} while ( byte == 0xFF );	
+									}
+									
+									// Remove the top bit
+									index &= 0x7F;
+									
+									pixel = palette[ index ];
+									
+									// Instead of doing setPixel for every pixel accounted for
+									// by the run length, we split up the run into separate rectangles
+									// that we can fill (which will speed up the drawing a bit)
+									runX = currentPixel % tileWidth;
+									runY = currentPixel / tileWidth;
+									
+									currentPixel += runLength;
+									
+									// Check to see if we need to run onto the next line at all
+									if ( runX + runLength > tileWidth )
+									{
+										// Check to make sure we can run along the line horizontally
+										if ( runX != 0 )
+										{
+											offScreenPixels.fillRect( new Rectangle( xLoc + runX, yLoc + runY, tileWidth - runX, 1 ), pixel );
+											runLength -= tileWidth - runX;
+											runX = 0;
+											runY++;
+										}
+										
+										// Run onto the next line
+										if ( runLength > tileWidth )
+										{
+											offScreenPixels.fillRect( new Rectangle( xLoc, yLoc + runY, tileWidth, runLength / tileWidth ), pixel );
+											runY += runLength / tileWidth;
+											runLength = runLength % tileWidth;
+										}
+									}
+									
+									// Handle the remaining pixels
+									if ( runLength != 0 )
+									{
+										offScreenPixels.fillRect( new Rectangle( xLoc + runX, yLoc + runY, runLength, 1 ), pixel );
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				// Done with the update, copy all of the pixel
+				// data to the on screen buffer
+				onScreenPixels.copyPixels( offScreenPixels, destRect, new Point( destRect.x, destRect.y ) );
+			}
+		]]>
+	</mx:Script>
+	
+	<!-- 
+		Force the remote screen canvas to be inside of a smaller one so
+		that we get scroll bars, instead of a huge popup window based on the
+		frame buffer width and height 
+	-->
+	<mx:Canvas>
+		<!-- 
+			Becuase the remote screen sends us the mouse image, we'll hide the user's mouse
+			while they're over the remoteScreen (to avoid 2 mouses) and then show the mouse
+			again when they leave the remote screen.
+			
+			TODO: There's no need for the server to draw the mouse, so use the local cursor
+			client side to improve performance
+		-->
+	   	<mx:UIComponent id="remoteScreen" mouseOver="Mouse.hide();" mouseOut="Mouse.show();" />
+   	</mx:Canvas>
+    
+</mx:TitleWindow>
