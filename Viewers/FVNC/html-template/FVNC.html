@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>${application}</title>
+<title>FVNC</title>
 <script src="AC_OETags.js" language="javascript"></script>
 <style>
 body { margin: 0px; overflow:hidden }
@@ -12,11 +12,11 @@ body { margin: 0px; overflow:hidden }
 // -----------------------------------------------------------------------------
 // Globals
 // Major version of Flash required
-var requiredMajorVersion = ${version_major};
+var requiredMajorVersion = 8;
 // Minor version of Flash required
-var requiredMinorVersion = ${version_minor};
+var requiredMinorVersion = 5;
 // Minor version of Flash required
-var requiredRevision = ${version_revision};
+var requiredRevision = 0;
 // -----------------------------------------------------------------------------
 // -->
 </script>
@@ -61,13 +61,13 @@ if ( hasProductInstall && !hasReqestedVersion ) {
 	AC_FL_RunContent(
 		"src", "playerProductInstall",
 		"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
-		"width", "${width}",
-		"height", "${height}",
+		"width", "100%",
+		"height", "100%",
 		"align", "middle",
-		"id", "${application}",
+		"id", "FVNC",
 		"quality", "high",
-		"bgcolor", "${bgcolor}",
-		"name", "${application}",
+		"bgcolor", "#869ca7",
+		"name", "FVNC",
 		"allowScriptAccess","sameDomain",
 		"type", "application/x-shockwave-flash",
 		"pluginspage", "http://www.macromedia.com/go/getflashplayer"
@@ -76,14 +76,14 @@ if ( hasProductInstall && !hasReqestedVersion ) {
 	// if we've detected an acceptable version
 	// embed the Flash Content SWF when all tests are passed
 	AC_FL_RunContent(
-			"src", "${swf}",
-			"width", "${width}",
-			"height", "${height}",
+			"src", "FVNC",
+			"width", "100%",
+			"height", "100%",
 			"align", "middle",
-			"id", "${application}",
+			"id", "FVNC",
 			"quality", "high",
-			"bgcolor", "${bgcolor}",
-			"name", "${application}",
+			"bgcolor", "#869ca7",
+			"name", "FVNC",
 			"allowScriptAccess","sameDomain",
 			"type", "application/x-shockwave-flash",
 			"pluginspage", "http://www.macromedia.com/go/getflashplayer"
@@ -98,14 +98,14 @@ if ( hasProductInstall && !hasReqestedVersion ) {
 </script>
 <noscript>
   	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-			id="${application}" width="${width}" height="${height}"
+			id="FVNC" width="100%" height="100%"
 			codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab">
-			<param name="movie" value="${swf}.swf" />
+			<param name="movie" value="FVNC.swf" />
 			<param name="quality" value="high" />
-			<param name="bgcolor" value="${bgcolor}" />
+			<param name="bgcolor" value="#869ca7" />
 			<param name="allowScriptAccess" value="sameDomain" />
-			<embed src="${swf}.swf" quality="high" bgcolor="${bgcolor}"
-				width="${width}" height="${height}" name="${application}" align="middle"
+			<embed src="FVNC.swf" quality="high" bgcolor="#869ca7"
+				width="100%" height="100%" name="FVNC" align="middle"
 				play="true"
 				loop="false"
 				quality="high"

@@ -128,7 +128,8 @@ public class RFBProtocol extends Socket {
 	/**
 	 * Writes the id to the reflector, if using one
 	 */
-	public function writeId():void {
+	public function writeId():int {
+		return 0;
 	}
 	
 	

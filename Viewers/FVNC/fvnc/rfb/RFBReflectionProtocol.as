@@ -44,7 +44,7 @@ import fvnc.rfb.PixelFormat;
 public class RFBReflectionProtocol extends RFBProtocol {
 	/** The id of the server we're connecting to */
 	private var id:uint;
-	
+	private var sentId:Boolean = false;
 	public function RFBReflectionProtocol( host:String, port:uint, id:uint )
 	{
 		super( host, port);
@@ -53,12 +53,18 @@ public class RFBReflectionProtocol extends RFBProtocol {
 		/**
 	 * Writes the id to the reflector, if using one
 	 */
-	public override function writeId():void {
+	public override function writeId():int {
+		if(this.sentId) {
+			return 0;
+		}
+		this.readVersion();
 		var id:String = "ID:" + this.id.toString();
 		var ba:ByteArray = StringUtil.toByteArray(id);
 		ba.writeByte(0);
 		writeBytes(ba,0,ba.length);
 		flush();
+		this.sentId = true;
+		return ba.length;
     }
 }
 

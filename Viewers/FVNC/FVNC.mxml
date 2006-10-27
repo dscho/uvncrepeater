@@ -144,15 +144,19 @@
 			 */
 			private function handshake( pe:ProgressEvent ):void
 			{
-				rfb.writeId();
+				var i:int = rfb.writeId();
+				if(i > 0) {
+					
+				} else {
+					rfb.readVersion();
+					trace( "RFB server supports protocol version " + rfb.majorVersion + "." + rfb.minorVersion );
+					rfb.writeVersion();
+					// After version is decided, the protocol is waiting for
+					// the authentication scheme
+					state = ProtocolState.GET_AUTH_SCHEME;
+				}
 				
-				rfb.readVersion();
-				trace( "RFB server supports protocol version " + rfb.majorVersion + "." + rfb.minorVersion );
-				rfb.writeVersion();
 				
-				// After version is decided, the protocol is waiting for
-				// the authentication scheme
-				state = ProtocolState.GET_AUTH_SCHEME;
 			}
 			
 			/**
@@ -304,7 +308,7 @@
 			private function doInitialization( pe:ProgressEvent ):void
 			{
 				// Wait for enough data in the socket before continuing
-				if ( rfb.bytesAvailable < 31 )
+				if ( rfb.bytesAvailable < 29 )
 				{
 					return;	
 				}
