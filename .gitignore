@@ -3,3 +3,5 @@
 /repeater/repeater
 *.class
 *.jar
+/viewers/JavaViewer/.classpath
+/viewers/JavaViewer/.project
