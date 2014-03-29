@@ -1,8 +1,8 @@
 
 CFLAGS=-Wall -DEVENTS_ENABLE -DEVENTS_USE_MYSQL -I/usr/include/mysql
-LDFLAGS=-lmysqlclient -lz -luuid
+LIBS=-lmysqlclient -lz -luuid
 repeater: repeater.o repeaterproc.o openbsd_stringfuncs.o iniparser.o readini.o repeaterutil.o repeaterevents.o
-	g++ $(CFLAGS) $(LDFLAGS) -o repeater repeater.o repeaterproc.o openbsd_stringfuncs.o iniparser.o readini.o repeaterutil.o repeaterevents.o
+	g++ $(CFLAGS) -o repeater repeater.o repeaterproc.o openbsd_stringfuncs.o iniparser.o readini.o repeaterutil.o repeaterevents.o $(LIBS)
 
 repeater.o: repeater.cpp
 	g++ $(CFLAGS) -c repeater.cpp
